@@ -1,5 +1,11 @@
 #! /usr/bin/env python
 
+from functools import partial
+
+class InvalidLooping(Exception):
+  def __init__(self):
+    Exception.__init__(self)
+
 class Root:
   def __init__(self):
     self.left  = self
@@ -30,12 +36,29 @@ class Column(Node):
     self.column = self
     Node.__init__(self, self.column)
 
+# does NOT apply fn to given node - ONLY to rest in its loop!
+# Root, (fn(Root) -> Root), (fn(Root, [Root]) -> T) -> [T]
+def loop_through_circular_list(node, move, fn):
+  current_node  = move(node)
+  visited_nodes = [node]
+  results = []
+  while current_node != node:
+    if current_node is None or current_node in visited_nodes:
+      raise InvalidLooping
+    results.append(fn(current_node)) # ugh
+    visited_nodes.append(current_node)
+    current_node = move(current_node)
+  return results
+
+
 # Column -> Root
-def cover_column(column)
+def cover_column(column):
   # removes reference to column from its matrix; does not modify column
   column.left.right = column.right
   column.right.left = column.left
   # for each OTHER node in column, remove that ROW from its surrounding matrix but do NOT modify column's association with it
+  # TODO more stuff
+  
 
 
 
@@ -44,7 +67,7 @@ def cover_column(column)
 
 
 
-# [Column] => Root
+# [Column] -> Root
 def make_matrix_from_columns(columns):
   cols = sorted(columns, key = lambda c: c.name) # sorted creates new sorted array; sort modifies in place
   root = Root()
@@ -54,25 +77,23 @@ def make_matrix_from_columns(columns):
     current = col
   return root
 
-# [str], [[int]] => Root
+# Iterator, Column -> Node
+def add_node_to_column_if_element_present(row_iter, column):
+  if next(row_iter) != 0:
+    node = Node(column)
+    column.up.insert_below(node)
+    return node
+  else:
+    return None
+
+# [str], [[int]] -> Root
 def make_matrix_from_rows(names, rows):
   columns = [Column(name) for name in names]
   matrix = make_matrix_from_columns(columns)
   for row in rows:
-    print("processing row {}".format(row))
-    nodes = []
-    names_for_row = [names[i] for i in range(0,len(row)) if row[i] != 0]
-    col = matrix.right
-    n = 0
-    while col != matrix:
-      if row[n] != 0:
-        print("inserted element into column {}".format(col.name))
-        node = Node(col)
-        col.up.insert_below(node)
-        nodes.append(node)
-      n += 1
-      col = col.right
-
+    row_iter = iter(row)
+    nodes = loop_through_circular_list(matrix, (lambda x: x.right), partial(add_node_to_column_if_element_present, row_iter))
+    nodes = [n for n in nodes if n is not None]
     if len(nodes) > 0:
       current_node = nodes[0]
       for node in nodes:

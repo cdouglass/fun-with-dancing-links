@@ -3,45 +3,35 @@
 import unittest
 from exact_cover import *
 
-# does not check name or size attributes
-def is_valid_matrix(matrix):
-  # check circularity of headers
+# Column -> bool
+def is_valid_column(column):
   horizontal_moves = [lambda x: x.right, lambda x: x.left]
   vertical_moves = [lambda x: x.down, lambda x: x.up]
-  if not all(check_circularity(matrix, fn) for fn in horizontal_moves):
+  if not all([check_circularity(v_move, column) for v_move in vertical_moves]): # check column is circular both ways
     return False
+  else: # moving downward, checks each row is circular both ways
+    return all(all(loop_through_circular_list(column, vertical_moves[0], partial(check_circularity, h_move))) for h_move in horizontal_moves)
 
-  # for each column, check circularity of the column and of each non-column node (use type == to avoid rechecking)
-  # this doesn't feel compact enough to me, oh well, fix it later
-  # I feel like a lot of this would be nicer if I knew how to use iterators better
-  columns = []
-  cn = matrix.right
-  while cn != matrix and cn not in columns:
-    columns.append(cn)
-
-  for column in columns:
-    if not all(check_circularity(column, fn) for fn in vertical_moves):
+# does not check name or size attributes
+# does not check that lists have same connections in each direction
+# Root -> bool
+def is_valid_matrix(matrix):
+  horizontal_moves = [lambda x: x.right, lambda x: x.left] # why the heck does this fail if I use left and right???
+  for h_move in horizontal_moves:
+    if not check_circularity(h_move, matrix): # check circularity of headers
       return False
-    rows = []
-    cr = column.down
-    while cr != column and cr not in rows:
-      rows.append(cr)
-      if not all(check_circularity(cr, fn) for fn in horizontal_moves):
-        return False
-
+    if not all(loop_through_circular_list(matrix, h_move, is_valid_column)):
+      return False
   return True
 
-# OK I've THREE TIMES done the thing where I iterate through every element in a linked list, I need to abstract this shit.
-
-def check_circularity(node, fn):
-  root = node
-  visited_nodes = []
-  current_node = fn(node)
-  while current_node != root:
-    if current_node is None or current_node in visited_nodes:
-      return False
-    visited_nodes.append(current_node)
-    current_node = fn(current_node)
+# Root -> bool
+def check_circularity(move, node): # changed order to allow currying
+  def null_fn(*args): # TODO get rid of this
+    return None
+  try:
+    loop_through_circular_list(node, move, null_fn) # we don't care about fn here
+  except InvalidLooping:
+    return False
   return True
 
 class TestHelperFunctions(unittest.TestCase):
