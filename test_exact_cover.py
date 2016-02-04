@@ -104,9 +104,9 @@ class TestMatrixOperations(unittest.TestCase):
 
   def setUp(self):
     self.names = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
-    arr = [[0, 0, 1, 0, 1, 1, 0], [1, 0, 0, 1, 0, 0, 1], [0, 1, 1, 0, 0, 1, 0],
-           [1, 0, 0, 1, 0, 0, 0], [0, 1, 0, 0, 0, 0, 1], [0, 0, 0, 1, 1, 0, 1]] # example from figure
-    self.matrix = make_matrix_from_rows(self.names, arr)
+    self.rows = [['a', 'd'], ['a', 'd', 'g'], ['b', 'c', 'f'],
+            ['b', 'g'], ['c', 'e', 'f'], ['d', 'e', 'g']]
+    self.matrix = make_matrix_from_rows(self.names, self.rows)
     return None
 
   def test_remove_element_horizontally(self):
@@ -123,17 +123,16 @@ class TestMatrixOperations(unittest.TestCase):
   def test_cover_column(self):
     col = self.matrix.right
     cover_column(col)
-    self.assertTrue(is_valid_matrix(self.matrix))
-    self.assertEqual('b', self.matrix.right.name)
-    self.assertEqual(1, self.matrix.right.right.right.size)
+    rows = sorted(make_rows_from_matrix(self.matrix))
+    expected_rows = [['b', 'c', 'f'], ['b', 'g'], ['c', 'e', 'f'], ['d', 'e', 'g']]
+    self.assertEqual(expected_rows, rows)
 
-  def test_uncover_column(self):
+  def test_uncover_column(self): # confirm undoes changes
     col = self.matrix.right
     cover_column(col)
     uncover_column(col)
-    self.assertTrue(is_valid_matrix(self.matrix))
-    self.assertEqual('a', self.matrix.right.name)
-    self.assertEqual(3, self.matrix.right.right.right.right.size)
+    rows = sorted(make_rows_from_matrix(self.matrix))
+    self.assertEqual(rows, self.rows)
 
   def test_make_matrix_from_columns(self):
     columns = [Column(i) for i in self.names]
@@ -148,13 +147,9 @@ class TestMatrixOperations(unittest.TestCase):
 
   def test_make_rows_from_matrix(self):
     rows = sorted(make_rows_from_matrix(self.matrix))
-    self.assertEqual(6, len(rows))
-    self.assertTrue(['c', 'e', 'f'] in rows)
-    self.assertTrue(['a', 'd', 'g'] in rows)
-    self.assertTrue(['b', 'c', 'f'] in rows)
-    self.assertTrue(['a', 'd'] in rows)
-    self.assertTrue(['b', 'g'] in rows)
-    self.assertTrue(['d', 'e', 'g'] in rows)
+    self.assertEqual(rows, self.rows)
+    rows = sorted(make_rows_from_matrix(self.matrix)) # confirm matrix isn't changed in the process
+    self.assertEqual(rows, self.rows)
 
   def test_add_row_to_matrix(self):
     return None

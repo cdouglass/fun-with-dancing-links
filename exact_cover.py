@@ -106,20 +106,21 @@ def make_matrix_from_columns(columns):
   return root
 
 # Iterator, Column -> Node
-def add_node_to_column_if_element_present(row_iter, column):
-  if next(row_iter) != 0:
+def add_node_to_column_if_element_present(row, column):
+  if column.name in row:
     node = Node(column)
     column.up.insert_below(node)
     return node
   else:
     return None
 
-# [str], [[int]] -> Root
+# [str], [[int]] -> Root # old, want below instead
+# [str], [[str]] -> Root
 def make_matrix_from_rows(names, rows):
   columns = [Column(name) for name in names]
   matrix = make_matrix_from_columns(columns)
   for row in rows:
-    nodes = loop_through_circular_list(matrix, (lambda x: x.right), partial(add_node_to_column_if_element_present, iter(row)))
+    nodes = loop_through_circular_list(matrix, (lambda x: x.right), partial(add_node_to_column_if_element_present, row))
     nodes = [n for n in nodes if n is not None]
     if len(nodes) > 0:
       current_node = nodes[0]
@@ -128,21 +129,16 @@ def make_matrix_from_rows(names, rows):
         current_node = node
   return matrix
 
-# TODO get rid of above fn in favor of this one - the ones and zeros were never actually helpful
-# TODO and then we can make test_make_rows_from_matrix nicer too
-def make_matrix_from_sets(names, sets):
-  
-
 # Root -> [str]
 def get_column_names_for_row(node):
   return(loop_through_circular_list(node, (lambda x: x.right), (lambda x: x.column.name)))
 
 # column names constitute first row
 # row order of output is not guaranteed, but we use a list not a set because sets should have immutable elements
-# WARNING this destroys the input!!! (for now...)
 # Root -> [str] + [[int]]
 def make_rows_from_matrix(matrix):
   rows = []
+  columns = []
   while matrix.right != matrix:
     column = matrix.right
     if column.down != column:
@@ -151,4 +147,7 @@ def make_rows_from_matrix(matrix):
       rows_for_this_column = [sorted(r + [name]) for r in rows_minus_this_column]
       rows += rows_for_this_column
     cover_column(column)
+    columns.append(column)
+  for column in columns[::-1]:
+    uncover_column(column) # undo changes to input matrix
   return rows
