@@ -78,6 +78,21 @@ def cover_column(column):
   loop_through_circular_list(column, (lambda x: x.down), cover_row) # removing top to bottom (so must uncover bottom to top)
   return(column)
 
+def restore_horizontally(column):
+  column.left.insert_right(column)
+
+def restore_vertically(node):
+  node.up.insert_below(node)
+
+def uncover_row(node):
+  loop_through_circular_list(node, lambda x: x.right, restore_vertically)
+  return(node)
+
+def uncover_column(column):
+  loop_through_circular_list(column, lambda x: x.up, uncover_row)
+  restore_horizontally(column)
+  return(column)
+
 # Moving info in and out of matrices
 
 # [Column] -> Root

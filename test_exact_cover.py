@@ -127,6 +127,14 @@ class TestMatrixOperations(unittest.TestCase):
     self.assertEqual('b', self.matrix.right.name)
     self.assertEqual(1, self.matrix.right.right.right.size)
 
+  def test_uncover_column(self):
+    col = self.matrix.right
+    cover_column(col)
+    uncover_column(col)
+    self.assertTrue(is_valid_matrix(self.matrix))
+    self.assertEqual('a', self.matrix.right.name)
+    self.assertEqual(3, self.matrix.right.right.right.right.size)
+
   def test_make_matrix_from_columns(self):
     names = ['a', 'b', 'c', 'd', 'e']
     columns = [Column(i) for i in names]
