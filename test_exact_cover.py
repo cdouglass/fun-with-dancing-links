@@ -103,10 +103,10 @@ class TestHelperFunctions(unittest.TestCase):
 class TestMatrixOperations(unittest.TestCase):
 
   def setUp(self):
-    names = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+    self.names = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
     arr = [[0, 0, 1, 0, 1, 1, 0], [1, 0, 0, 1, 0, 0, 1], [0, 1, 1, 0, 0, 1, 0],
            [1, 0, 0, 1, 0, 0, 0], [0, 1, 0, 0, 0, 0, 1], [0, 0, 0, 1, 1, 0, 1]] # example from figure
-    self.matrix = make_matrix_from_rows(names, arr)
+    self.matrix = make_matrix_from_rows(self.names, arr)
     return None
 
   def test_remove_element_horizontally(self):
@@ -136,8 +136,7 @@ class TestMatrixOperations(unittest.TestCase):
     self.assertEqual(3, self.matrix.right.right.right.right.size)
 
   def test_make_matrix_from_columns(self):
-    names = ['a', 'b', 'c', 'd', 'e']
-    columns = [Column(i) for i in names]
+    columns = [Column(i) for i in self.names]
     matrix = make_matrix_from_columns(columns)
     self.assertTrue(is_valid_matrix(matrix))
     self.assertEqual('a', matrix.right.name)
@@ -148,8 +147,14 @@ class TestMatrixOperations(unittest.TestCase):
     self.assertEqual(3, self.matrix.right.right.right.right.size)
 
   def test_make_rows_from_matrix(self):
-    return None
-    # TODO
+    rows = sorted(make_rows_from_matrix(self.matrix))
+    self.assertEqual(6, len(rows))
+    self.assertTrue(['c', 'e', 'f'] in rows)
+    self.assertTrue(['a', 'd', 'g'] in rows)
+    self.assertTrue(['b', 'c', 'f'] in rows)
+    self.assertTrue(['a', 'd'] in rows)
+    self.assertTrue(['b', 'g'] in rows)
+    self.assertTrue(['d', 'e', 'g'] in rows)
 
   def test_add_row_to_matrix(self):
     return None

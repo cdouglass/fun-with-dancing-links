@@ -127,3 +127,28 @@ def make_matrix_from_rows(names, rows):
         current_node.insert_right(node)
         current_node = node
   return matrix
+
+# TODO get rid of above fn in favor of this one - the ones and zeros were never actually helpful
+# TODO and then we can make test_make_rows_from_matrix nicer too
+def make_matrix_from_sets(names, sets):
+  
+
+# Root -> [str]
+def get_column_names_for_row(node):
+  return(loop_through_circular_list(node, (lambda x: x.right), (lambda x: x.column.name)))
+
+# column names constitute first row
+# row order of output is not guaranteed, but we use a list not a set because sets should have immutable elements
+# WARNING this destroys the input!!! (for now...)
+# Root -> [str] + [[int]]
+def make_rows_from_matrix(matrix):
+  rows = []
+  while matrix.right != matrix:
+    column = matrix.right
+    if column.down != column:
+      name = column.name
+      rows_minus_this_column = loop_through_circular_list(column, (lambda x: x.down), get_column_names_for_row) # doesn't get name of current_column
+      rows_for_this_column = [sorted(r + [name]) for r in rows_minus_this_column]
+      rows += rows_for_this_column
+    cover_column(column)
+  return rows
