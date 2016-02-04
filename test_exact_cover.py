@@ -26,7 +26,7 @@ def is_valid_matrix(matrix):
 
 # Root -> bool
 def check_circularity(move, node): # changed order to allow currying
-  def null_fn(*args): # TODO get rid of this
+  def null_fn(*args): # silly
     return None
   try:
     loop_through_circular_list(node, move, null_fn) # we don't care about fn here
@@ -151,48 +151,41 @@ class TestMatrixOperations(unittest.TestCase):
     rows = sorted(make_rows_from_matrix(self.matrix)) # confirm matrix isn't changed in the process
     self.assertEqual(rows, self.rows)
 
-  def test_add_row_to_matrix(self):
-    return None
-    # TODO
-  
-  def test_remove_row_from_matrix(self):
-    return None
-    # TODO
-
-  def test_restore_row_to_matrix(self):
-    return None
-    # TODO
-
-  def test_add_column_to_matrix(self):
-    return None
-    # TODO
-
-  def test_remove_column_from_matrix(self):
-    return None
-    # TODO
-
-  def test_restore_column_to_matrix(self):
-    return None
-
 # given a problem formatted as a matrix, does it yield a proper solution?
 class TestAlgorithm(unittest.TestCase):
 
-  def test_backtrack(self):
-    return None
-  # TODO break this up?
+  def setUp(self):
+    self.names = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+    self.rows = [['a', 'd'], ['a', 'd', 'g'], ['b', 'c', 'f'],
+            ['b', 'g'], ['c', 'e', 'f'], ['d', 'e', 'g']]
+    self.matrix = make_matrix_from_rows(self.names, self.rows)
 
   def test_impossible(self):
-    return None
-  # TODO
+    rows = [['a', 'd', 'f'], ['a', 'd', 'g'], ['b', 'c', 'f'],
+            ['b', 'g'], ['c', 'e', 'f'], ['d', 'e', 'g']]
+    matrix = make_matrix_from_rows(self.names, rows)
+    solutions = []
+    find_exact_cover(matrix, solutions, [])
+    self.assertEqual([], solutions)
 
   def test_simple_case(self):
-    return None
-  # TODO
+    solutions = []
+    find_exact_cover(self.matrix, solutions, [])
+    pretty_solutions = sorted([[sorted(get_column_names_for_row(row) + [row.column.name]) for row in solution] for solution in solutions])
+    self.assertEqual([[['a', 'd'], ['b', 'g'], ['c', 'e', 'f']]], pretty_solutions)
+    self.assertEqual(1, len(solutions))
+    rows = sorted(make_rows_from_matrix(self.matrix)) # confirm matrix unchanged
+    self.assertEqual(rows, self.rows)
 
-  def test_four_queens(self):
-    return None
-  # TODO
-
+  def test_multiple_solutions(self):
+    rows = [['c', 'd', 'e'], ['a', 'f'], ['b', 'g'],
+            ['a', 'b'], ['f', 'g'], ['b', 'c', 'd', 'e', 'g']]
+    multiple_solutions_matrix = make_matrix_from_rows(self.names, rows)
+    solutions = []
+    find_exact_cover(multiple_solutions_matrix, solutions, [])
+    pretty_solutions = sorted([[sorted(get_column_names_for_row(row) + [row.column.name]) for row in solution] for solution in solutions])
+    self.assertEqual([[['a', 'b'], ['c', 'd', 'e'], ['f', 'g']], [['a', 'f'], ['b', 'c', 'd', 'e', 'g']], [['a', 'f'], ['b', 'g'], ['c', 'd', 'e']]], pretty_solutions)
+    self.assertEqual(3, len(solutions))
 
 if __name__ == '__main__':
   unittest.main()

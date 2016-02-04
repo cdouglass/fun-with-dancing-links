@@ -93,6 +93,28 @@ def uncover_column(column):
   restore_horizontally(column)
   return(column)
 
+# Algorithm
+
+# not really using return value here
+def find_exact_cover(matrix, full_solutions = [], partial_solution = []):
+  if matrix.right == matrix:
+    full_solutions.append(partial_solution.copy())
+    partial_solution == [] # terminate successfully
+  elif matrix.right.up == matrix.right:
+    partial_solution == [] # terminate unsuccessfully
+  else:
+    column = matrix.right # TODO improve by picking column with fewest elements instead
+    cover_column(column)
+    rows_in_column = loop_through_circular_list(column, (lambda x: x.down), (lambda x: x)) # [Node]
+    for row in rows_in_column:
+      partial_solution.append(row)
+      loop_through_circular_list(row, (lambda x: x.right), (lambda x: cover_column(x.column)))
+      find_exact_cover(matrix, full_solutions, partial_solution)
+      loop_through_circular_list(row, (lambda x: x.left), (lambda x: uncover_column(x.column)))
+      partial_solution.pop()
+    uncover_column(column) # restore matrix to original state
+  return None
+
 # Moving info in and out of matrices
 
 # [Column] -> Root
@@ -143,7 +165,7 @@ def make_rows_from_matrix(matrix):
     column = matrix.right
     if column.down != column:
       name = column.name
-      rows_minus_this_column = loop_through_circular_list(column, (lambda x: x.down), get_column_names_for_row) # doesn't get name of current_column
+      rows_minus_this_column = loop_through_circular_list(column, (lambda x: x.down), get_column_names_for_row) # doesn't get name of current_column, add that in next line
       rows_for_this_column = [sorted(r + [name]) for r in rows_minus_this_column]
       rows += rows_for_this_column
     cover_column(column)
