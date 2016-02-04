@@ -36,6 +36,8 @@ class Column(Node):
     self.column = self
     Node.__init__(self, self.column)
 
+# Operations on matrices
+
 # does NOT apply fn to given node - ONLY to rest in its loop!
 # Root, (fn(Root) -> Root), (fn(Root, [Root]) -> T) -> [T]
 def loop_through_circular_list(node, move, fn):
@@ -50,22 +52,33 @@ def loop_through_circular_list(node, move, fn):
     current_node = move(current_node)
   return results
 
+# when I define a similar fn as an instance method the side effects don't happen
+# Column -> Column (but we care more about side effect on surrounding matrix)
+def remove_horizontally(column):
+  column.left.right = column.right
+  column.right.left = column.left
+  return column
+
+# Node -> Node
+def remove_vertically(node):
+  node.up.down = node.down
+  node.down.up = node.up
+  node.column.size -= 1
+  return node
+
+# Node -> Node
+def cover_row(node):
+  loop_through_circular_list(node, lambda x: x.right, remove_vertically)
+  return(node)
 
 # Column -> Root
 def cover_column(column):
-  # removes reference to column from its matrix; does not modify column
-  column.left.right = column.right
-  column.right.left = column.left
-  # for each OTHER node in column, remove that ROW from its surrounding matrix but do NOT modify column's association with it
-  # TODO more stuff
-  
+  remove_horizontally(column)
+  # for each non-top-level node in column, remove that node from matrix
+  loop_through_circular_list(column, (lambda x: x.down), cover_row) # removing top to bottom (so must uncover bottom to top)
+  return(column)
 
-
-
-
-
-
-
+# Moving info in and out of matrices
 
 # [Column] -> Root
 def make_matrix_from_columns(columns):
@@ -91,8 +104,7 @@ def make_matrix_from_rows(names, rows):
   columns = [Column(name) for name in names]
   matrix = make_matrix_from_columns(columns)
   for row in rows:
-    row_iter = iter(row)
-    nodes = loop_through_circular_list(matrix, (lambda x: x.right), partial(add_node_to_column_if_element_present, row_iter))
+    nodes = loop_through_circular_list(matrix, (lambda x: x.right), partial(add_node_to_column_if_element_present, iter(row)))
     nodes = [n for n in nodes if n is not None]
     if len(nodes) > 0:
       current_node = nodes[0]

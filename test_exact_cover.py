@@ -100,8 +100,32 @@ class TestHelperFunctions(unittest.TestCase):
     self.node.right = self.column
     self.assertFalse(is_valid_matrix(self.root))
 
-
 class TestMatrixOperations(unittest.TestCase):
+
+  def setUp(self):
+    names = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+    arr = [[0, 0, 1, 0, 1, 1, 0], [1, 0, 0, 1, 0, 0, 1], [0, 1, 1, 0, 0, 1, 0],
+           [1, 0, 0, 1, 0, 0, 0], [0, 1, 0, 0, 0, 0, 1], [0, 0, 0, 1, 1, 0, 1]] # example from figure
+    self.matrix = make_matrix_from_rows(names, arr)
+    return None
+
+  def test_remove_element_horizontally(self):
+    col = self.matrix.right
+    remove_horizontally(col)
+    self.assertTrue(is_valid_matrix(self.matrix))
+    self.assertEqual(self.matrix.right, col.right)
+
+  def test_remove_element_vertically(self):
+    node = self.matrix.right.down
+    remove_vertically(node)
+    self.assertEqual(1, self.matrix.right.size)
+
+  def test_cover_column(self):
+    col = self.matrix.right
+    cover_column(col)
+    self.assertTrue(is_valid_matrix(self.matrix))
+    self.assertEqual('b', self.matrix.right.name)
+    self.assertEqual(1, self.matrix.right.right.right.size)
 
   def test_make_matrix_from_columns(self):
     names = ['a', 'b', 'c', 'd', 'e']
@@ -110,16 +134,12 @@ class TestMatrixOperations(unittest.TestCase):
     self.assertTrue(is_valid_matrix(matrix))
     self.assertEqual('a', matrix.right.name)
 
-  def test_make_matrix_from_arrays(self):
-    names = ['a', 'b', 'c', 'd', 'e']
-    arr = [[1, 0, 0, 1, 0], [0, 0, 1, 0, 1], [1, 0, 1, 1, 1], [0, 0, 0, 0, 0], [0, 0, 0, 1, 0]]
-    matrix = make_matrix_from_rows(names, arr)
-    self.assertTrue(is_valid_matrix(matrix))
-    self.assertEqual(2, matrix.right.size)
-    self.assertEqual(0, matrix.right.right.size)
-    self.assertEqual(3, matrix.right.right.right.right.size)
+  def test_make_matrix_from_rows(self):
+    self.assertTrue(is_valid_matrix(self.matrix))
+    self.assertEqual(2, self.matrix.right.size)
+    self.assertEqual(3, self.matrix.right.right.right.right.size)
 
-  def test_make_arrays_from_matrix(self):
+  def test_make_rows_from_matrix(self):
     return None
     # TODO
 
