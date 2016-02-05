@@ -4,11 +4,13 @@ import sudoku
 
 # display-related constants
 BLACK = 0, 0, 0
+DARK_GRAY = 100, 100, 100
 GRAY = 200, 200, 200
 WHITE = 255, 255, 255
 
 BG_COLOR   = WHITE
 TEXT_COLOR = BLACK
+PLAYER_COLOR = DARK_GRAY # used for player's own moves
 BOX_COLOR  = GRAY
 
 SCREEN_HEIGHT = 500
@@ -63,18 +65,23 @@ draw_blank_board()
 background = background.convert() # store surface in memory for faster painting. if using transparency, would use .convert_alpha() instead
 
 # pygame can't draw text on an existing surface, must create new one
-def blit_numbers(board):
+def blit_numbers(board, color):
   for (index, box) in enumerate(small_boxes): # i is a tuple (position, index)
     number = board[index]
-    if number != 0:
+    if number in range(1, 10):
       box_center = box.center
-      number_surface = main_font.render(str(number), True, TEXT_COLOR)
+      number_surface = main_font.render(str(number), True, color)
       surface_box = number_surface.get_rect()
       surface_box.center = box_center
       screen.blit(number_surface, surface_box)
   
-board = sudoku.get_board()
+givens = sudoku.get_new_board()
+player_moves = sudoku.get_empty_board()
+
 mainloop = True
+
+     
+
 
 while mainloop == True:
   clock.tick(30)
@@ -86,11 +93,29 @@ while mainloop == True:
     elif event.type == pygame.KEYDOWN:
       if event.key == pygame.K_q:
         mainloop = False # allows nicer teardown than sys.exit()
-      elif event.key == pygame.K_n: # TODO button-click instead
-        board = sudoku.get_board()
+      elif event.key == pygame.K_n:
+        givens = sudoku.get_new_board()
+      elif event.key == pygame.K_c:
+        player_moves = sudoku.get_empty_board()
+      # for now player moves by pressing 'm', then row, then column, then value
+      # while this technically works, it's very irritating
+      elif event.key == pygame.K_m:
+        nums = []
+        while len(nums) < 3:
+          for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+              char = event.unicode
+              try:
+                nums.append(int(event.unicode))
+              except ValueError: # not a number
+                break
+        row, column, value = nums
+        position = (row - 1) * 9 + (column - 1)
+        player_moves[position] = value
 
   screen.blit(background, (0, 0)) # coords give position of upper left corner of background surface
   screen.blit(title_surface, title_box)
-  blit_numbers(board)
+  blit_numbers(givens, TEXT_COLOR)
+  blit_numbers(player_moves, PLAYER_COLOR)
 
   pygame.display.update()
