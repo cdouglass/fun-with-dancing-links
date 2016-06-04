@@ -8,3 +8,8 @@ Setup:
 * `pip install Flask`
 * `python3 app.py`
 * Site will be running at http://localhost:5000
+
+Running the tests:
+```
+$ python3 -m tests
+```

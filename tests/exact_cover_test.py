@@ -1,7 +1,16 @@
 #! /usr/bin/env python
 
 import unittest
-from exact_cover import *
+
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
+
+import lib # only works when running from same directory
+
+from lib import exact_cover
+from lib.exact_cover import *
+
 
 # Column -> bool
 def is_valid_column(column):
@@ -186,6 +195,3 @@ class TestAlgorithm(unittest.TestCase):
     pretty_solutions = sorted([[sorted(get_column_names_for_row(row) + [row.column.name]) for row in solution] for solution in solutions])
     self.assertEqual([[['a', 'b'], ['c', 'd', 'e'], ['f', 'g']], [['a', 'f'], ['b', 'c', 'd', 'e', 'g']], [['a', 'f'], ['b', 'g'], ['c', 'd', 'e']]], pretty_solutions)
     self.assertEqual(3, len(solutions))
-
-if __name__ == '__main__':
-  unittest.main()
