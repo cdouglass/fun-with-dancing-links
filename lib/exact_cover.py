@@ -1,8 +1,3 @@
-#! /usr/bin/env python
-
-import sys
-from functools import partial
-
 class InvalidLooping(Exception):
   def __init__(self):
     Exception.__init__(self)
@@ -16,6 +11,20 @@ class Root:
     column.left     = self
     self.right.left = column
     self.right      = column
+# TODO this way of passing functions to loop_through_circular_list is... ick. Can I replace this somehow?
+# does NOT apply fn to given node - ONLY to rest in its loop!
+# Root, (fn(Root) -> Root), (fn(Root, [Root]) -> T) -> [T]
+  def loop_through_circular_list(self, move, fn):
+    current_node  = move(self)
+    visited_nodes = [self]
+    results = []
+    while current_node != self:
+      if current_node is None or current_node in visited_nodes:
+        raise InvalidLooping
+      results.append(fn(current_node)) # ugh
+      visited_nodes.append(current_node)
+      current_node = move(current_node)
+    return results
 
 class Node(Root):
   def __init__(self, column):
@@ -29,6 +38,19 @@ class Node(Root):
     self.down.up = node
     self.down    = node
     self.column.size += 1
+  def remove_vertically(self):
+    self.up.down = self.down
+    self.down.up = self.up
+    self.column.size -= 1
+  def restore_vertically(self):
+    self.up.insert_below(self)
+  def cover_row(self):
+    self.loop_through_circular_list(lambda x: x.right, lambda n: n.remove_vertically())
+  def uncover_row(self):
+    self.loop_through_circular_list(lambda x: x.right, lambda x: x.restore_vertically())
+  # TODO doesn't include own column but should!
+  def get_column_names_for_row(self):
+    return(self.loop_through_circular_list(lambda x: x.right, lambda x: x.column.name))
 
 class Column(Node):
   def __init__(self, name):
@@ -36,63 +58,25 @@ class Column(Node):
     self.size   = 0
     self.column = self
     Node.__init__(self, self.column)
-
-# Operations on matrices
-
-# does NOT apply fn to given node - ONLY to rest in its loop!
-# Root, (fn(Root) -> Root), (fn(Root, [Root]) -> T) -> [T]
-def loop_through_circular_list(node, move, fn):
-  current_node  = move(node)
-  visited_nodes = [node]
-  results = []
-  while current_node != node:
-    if current_node is None or current_node in visited_nodes:
-      raise InvalidLooping
-    results.append(fn(current_node)) # ugh
-    visited_nodes.append(current_node)
-    current_node = move(current_node)
-  return results
-
-# when I define a similar fn as an instance method the side effects don't happen
-# Column -> Column (but we care more about side effect on surrounding matrix)
-def remove_horizontally(column):
-  column.left.right = column.right
-  column.right.left = column.left
-  return column
-
-# Node -> Node
-def remove_vertically(node):
-  node.up.down = node.down
-  node.down.up = node.up
-  node.column.size -= 1
-  return node
-
-# Node -> Node
-def cover_row(node):
-  loop_through_circular_list(node, lambda x: x.right, remove_vertically)
-  return(node)
-
-# Column -> Root
-def cover_column(column):
-  remove_horizontally(column)
-  # for each non-top-level node in column, remove that node from matrix
-  loop_through_circular_list(column, (lambda x: x.down), cover_row) # removing top to bottom (so must uncover bottom to top)
-  return(column)
-
-def restore_horizontally(column):
-  column.left.insert_right(column)
-
-def restore_vertically(node):
-  node.up.insert_below(node)
-
-def uncover_row(node):
-  loop_through_circular_list(node, lambda x: x.right, restore_vertically)
-  return(node)
-
-def uncover_column(column):
-  loop_through_circular_list(column, lambda x: x.up, uncover_row)
-  restore_horizontally(column)
-  return(column)
+  def remove_horizontally(self):
+    self.left.right = self.right
+    self.right.left = self.left
+  def restore_horizontally(self):
+    self.left.insert_right(self)
+  # Column -> Root
+  def cover_column(self):
+    self.remove_horizontally()
+    # for each non-top-level node in column, remove that node from matrix
+    self.loop_through_circular_list(lambda x: x.down, lambda x: x.cover_row()) # removing top to bottom (so must uncover bottom to top)
+  def uncover_column(self):
+    self.loop_through_circular_list(lambda x: x.up, lambda x: x.uncover_row())
+    self.restore_horizontally()
+  # [str], Column -> Node
+  def add_node_to_column_if_element_present(self, row):
+    if self.name in row:
+      node = Node(self)
+      self.up.insert_below(node)
+      return node
 
 # Algorithm
 
@@ -106,16 +90,23 @@ def find_exact_cover(matrix, full_solutions = [], partial_solution = []):
   else:
     # TODO this never happens with n queens - the dead end case is happening immediately so the matrix can't be getting set up right!
     column = matrix.right # TODO improve by picking column with fewest elements instead
-    cover_column(column)
-    rows_in_column = loop_through_circular_list(column, (lambda x: x.down), (lambda x: x)) # [Node]
+    column.cover_column()
+    rows_in_column = column.loop_through_circular_list(lambda x: x.down, lambda x: x) # [Node]
     for row in rows_in_column:
       partial_solution.append(row)
-      loop_through_circular_list(row, (lambda x: x.right), (lambda x: cover_column(x.column)))
+      row.loop_through_circular_list(lambda x: x.right, lambda x: x.column.cover_column())
       find_exact_cover(matrix, full_solutions, partial_solution)
-      loop_through_circular_list(row, (lambda x: x.left), (lambda x: uncover_column(x.column)))
+      row.loop_through_circular_list(lambda x: x.left, lambda x: x.column.uncover_column())
       partial_solution.pop()
-    uncover_column(column) # restore matrix to original state
-  return None
+    column.uncover_column() # restore matrix to original state
+
+# convenience
+# [str], [[str]] -> [[[str]]]
+def find_exact_cover_for_rows(names, rows):
+  solutions = []
+  matrix = make_matrix_from_rows(names, rows)
+  find_exact_cover(matrix, solutions)
+  return [[node.get_column_names_for_row() + [node.column.name] for node in sol] for sol in solutions]
 
 # Moving info in and out of matrices
 
@@ -129,22 +120,13 @@ def make_matrix_from_columns(columns):
     current = col
   return root
 
-# Iterator, Column -> Node
-def add_node_to_column_if_element_present(row, column):
-  if column.name in row:
-    node = Node(column)
-    column.up.insert_below(node)
-    return node
-  else:
-    return None
-
 # [str], [[int]] -> Root # old, want below instead
 # [str], [[str]] -> Root
 def make_matrix_from_rows(names, rows):
   columns = [Column(name) for name in names]
   matrix = make_matrix_from_columns(columns)
   for row in rows:
-    nodes = loop_through_circular_list(matrix, (lambda x: x.right), partial(add_node_to_column_if_element_present, row))
+    nodes = matrix.loop_through_circular_list(lambda x: x.right, lambda x: x.add_node_to_column_if_element_present(row))
     nodes = [n for n in nodes if n is not None]
     if len(nodes) > 0:
       current_node = nodes[0]
@@ -152,10 +134,6 @@ def make_matrix_from_rows(names, rows):
         current_node.insert_right(node)
         current_node = node
   return matrix
-
-# Root -> [str]
-def get_column_names_for_row(node):
-  return(loop_through_circular_list(node, (lambda x: x.right), (lambda x: x.column.name)))
 
 # column names constitute first row
 # row order of output is not guaranteed, but we use a list not a set because sets should have immutable elements
@@ -167,19 +145,11 @@ def make_rows_from_matrix(matrix):
     column = matrix.right
     if column.down != column:
       name = column.name
-      rows_minus_this_column = loop_through_circular_list(column, (lambda x: x.down), get_column_names_for_row) # doesn't get name of current_column, add that in next line
+      rows_minus_this_column = column.loop_through_circular_list(lambda x: x.down, lambda x: x.get_column_names_for_row()) # doesn't get name of current_column, add that in next line
       rows_for_this_column = [sorted(r + [name]) for r in rows_minus_this_column]
       rows += rows_for_this_column
-    cover_column(column)
+    column.cover_column()
     columns.append(column)
   for column in columns[::-1]:
-    uncover_column(column) # undo changes to input matrix
+    column.uncover_column() # undo changes to input matrix
   return rows
-
-# convenience
-# [str], [[str]] -> [[[str]]]
-def find_exact_cover_for_rows(names, rows):
-  matrix = make_matrix_from_rows(names, rows)
-  solutions = []
-  find_exact_cover(matrix, solutions)
-  return [make_rows_from_matrix(sol) for sol in solutions]

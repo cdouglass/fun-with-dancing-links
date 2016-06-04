@@ -1,16 +1,12 @@
 #! /usr/bin/env python
-
-import unittest
-
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 
-import lib # only works when running from same directory
-
-from lib import exact_cover
 from lib.exact_cover import *
 
+import unittest
+from functools import partial
 
 # Column -> bool
 def is_valid_column(column):
@@ -19,7 +15,7 @@ def is_valid_column(column):
   if not all([check_circularity(v_move, column) for v_move in vertical_moves]): # check column is circular both ways
     return False
   else: # moving downward, checks each row is circular both ways
-    return all(all(loop_through_circular_list(column, vertical_moves[0], partial(check_circularity, h_move))) for h_move in horizontal_moves)
+    return all(all(column.loop_through_circular_list(vertical_moves[0], partial(check_circularity, h_move))) for h_move in horizontal_moves)
 
 # does not check name or size attributes
 # does not check that lists have same connections in each direction
@@ -29,7 +25,7 @@ def is_valid_matrix(matrix):
   for h_move in horizontal_moves:
     if not check_circularity(h_move, matrix): # check circularity of headers
       return False
-    if not all(loop_through_circular_list(matrix, h_move, is_valid_column)):
+    if not all(matrix.loop_through_circular_list(h_move, is_valid_column)):
       return False
   return True
 
@@ -38,7 +34,7 @@ def check_circularity(move, node): # changed order to allow currying
   def null_fn(*args): # silly
     return None
   try:
-    loop_through_circular_list(node, move, null_fn) # we don't care about fn here
+    node.loop_through_circular_list(move, null_fn) # we don't care about fn here
   except InvalidLooping:
     return False
   return True
@@ -120,26 +116,26 @@ class TestMatrixOperations(unittest.TestCase):
 
   def test_remove_element_horizontally(self):
     col = self.matrix.right
-    remove_horizontally(col)
+    col.remove_horizontally()
     self.assertTrue(is_valid_matrix(self.matrix))
     self.assertEqual(self.matrix.right, col.right)
 
   def test_remove_element_vertically(self):
     node = self.matrix.right.down
-    remove_vertically(node)
+    node.remove_vertically()
     self.assertEqual(1, self.matrix.right.size)
 
   def test_cover_column(self):
     col = self.matrix.right
-    cover_column(col)
+    col.cover_column()
     rows = sorted(make_rows_from_matrix(self.matrix))
     expected_rows = [['b', 'c', 'f'], ['b', 'g'], ['c', 'e', 'f'], ['d', 'e', 'g']]
     self.assertEqual(expected_rows, rows)
 
   def test_uncover_column(self): # confirm undoes changes
     col = self.matrix.right
-    cover_column(col)
-    uncover_column(col)
+    col.cover_column()
+    col.uncover_column()
     rows = sorted(make_rows_from_matrix(self.matrix))
     self.assertEqual(rows, self.rows)
 
@@ -180,7 +176,7 @@ class TestAlgorithm(unittest.TestCase):
   def test_simple_case(self):
     solutions = []
     find_exact_cover(self.matrix, solutions, [])
-    pretty_solutions = sorted([[sorted(get_column_names_for_row(row) + [row.column.name]) for row in solution] for solution in solutions])
+    pretty_solutions = sorted([[sorted(row.get_column_names_for_row() + [row.column.name]) for row in solution] for solution in solutions])
     self.assertEqual([[['a', 'd'], ['b', 'g'], ['c', 'e', 'f']]], pretty_solutions)
     self.assertEqual(1, len(solutions))
     rows = sorted(make_rows_from_matrix(self.matrix)) # confirm matrix unchanged
@@ -192,6 +188,19 @@ class TestAlgorithm(unittest.TestCase):
     multiple_solutions_matrix = make_matrix_from_rows(self.names, rows)
     solutions = []
     find_exact_cover(multiple_solutions_matrix, solutions, [])
-    pretty_solutions = sorted([[sorted(get_column_names_for_row(row) + [row.column.name]) for row in solution] for solution in solutions])
+    pretty_solutions = sorted([[sorted(row.get_column_names_for_row() + [row.column.name]) for row in solution] for solution in solutions])
     self.assertEqual([[['a', 'b'], ['c', 'd', 'e'], ['f', 'g']], [['a', 'f'], ['b', 'c', 'd', 'e', 'g']], [['a', 'f'], ['b', 'g'], ['c', 'd', 'e']]], pretty_solutions)
     self.assertEqual(3, len(solutions))
+
+class TestIntegration(unittest.TestCase):
+  def setUp(self):
+    self.names = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+    self.rows = [['a', 'd'], ['a', 'd', 'g'], ['b', 'c', 'f'],
+            ['b', 'g'], ['c', 'e', 'f'], ['d', 'e', 'g']]
+
+  # TODO method for sorting solutions neatly
+  def test_simple_case(self):
+    solutions = find_exact_cover_for_rows(self.names, self.rows)
+    sorted_solutions = [sorted([sorted(row) for row in sol]) for sol in solutions]
+    self.assertEqual([[['a', 'd'], ['b', 'g'], ['c', 'e', 'f']]], sorted_solutions)
+    self.assertEqual(1, len(solutions))
