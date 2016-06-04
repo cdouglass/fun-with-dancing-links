@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+import sys
 from functools import partial
 
 class InvalidLooping(Exception):
@@ -98,11 +99,15 @@ def uncover_column(column):
 # not really using return value here
 def find_exact_cover(matrix, full_solutions = [], partial_solution = []):
   if matrix.right == matrix:
+    print("added a solution", file=sys.stderr)
     full_solutions.append(partial_solution.copy())
     partial_solution == [] # terminate successfully
   elif matrix.right.up == matrix.right:
+    print("dead end!", file=sys.stderr)
     partial_solution == [] # terminate unsuccessfully
   else:
+    # TODO this never happens with n queens - the dead end case is happening immediately so the matrix can't be getting set up right!
+    print("trying to remove rightmost column", file=sys.stderr)
     column = matrix.right # TODO improve by picking column with fewest elements instead
     cover_column(column)
     rows_in_column = loop_through_circular_list(column, (lambda x: x.down), (lambda x: x)) # [Node]
@@ -139,6 +144,11 @@ def add_node_to_column_if_element_present(row, column):
 # [str], [[int]] -> Root # old, want below instead
 # [str], [[str]] -> Root
 def make_matrix_from_rows(names, rows):
+  print("columns given", file=sys.stderr)
+  print(names, file=sys.stderr)
+  print("rows given", file=sys.stderr)
+  for row in rows:
+    print(row, file=sys.stderr)
   columns = [Column(name) for name in names]
   matrix = make_matrix_from_columns(columns)
   for row in rows:
@@ -173,3 +183,12 @@ def make_rows_from_matrix(matrix):
   for column in columns[::-1]:
     uncover_column(column) # undo changes to input matrix
   return rows
+
+# convenience
+# [str], [[str]] -> [[[str]]]
+def find_exact_cover_for_rows(names, rows):
+  print("finding exact cover", file=sys.stderr)
+  matrix = make_matrix_from_rows(names, rows)
+  solutions = []
+  find_exact_cover(matrix, solutions)
+  return [make_rows_from_matrix(sol) for sol in solutions]
