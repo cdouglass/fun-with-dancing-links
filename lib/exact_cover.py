@@ -1,3 +1,5 @@
+import sys
+
 class InvalidLooping(Exception):
   def __init__(self):
     Exception.__init__(self)
@@ -48,7 +50,6 @@ class Node(Root):
     self.loop_through_circular_list(lambda x: x.right, lambda n: n.remove_vertically())
   def uncover_row(self):
     self.loop_through_circular_list(lambda x: x.right, lambda x: x.restore_vertically())
-  # TODO doesn't include own column but should!
   def get_column_names_for_row(self):
     return [self.column.name] + self.loop_through_circular_list(lambda x: x.right, lambda x: x.column.name)
 
@@ -80,14 +81,16 @@ class Column(Node):
 
 # Algorithm
 
-# not really using return value here
 def find_exact_cover(matrix, full_solutions = [], partial_solution = []):
   if matrix.right == matrix:
+    print("IF CASE!!!!", sys.stderr)
     full_solutions.append(partial_solution.copy())
     partial_solution == [] # terminate successfully
   elif matrix.right.up == matrix.right:
+    print("ELIF CASE!!!!", sys.stderr)
     partial_solution == [] # terminate unsuccessfully
   else:
+    print("ELSE CASE!!!!", sys.stderr)
     # TODO this never happens with n queens - the dead end case is happening immediately so the matrix can't be getting set up right!
     column = matrix.right # TODO improve by picking column with fewest elements instead
     column.cover_column()

@@ -205,3 +205,16 @@ class TestAlgorithm(unittest.TestCase):
     solutions = find_exact_cover_for_rows(self.names, self.multiple_solutions_rows)
     self.assertEqual(self.expected_multiple_solutions, standardize_solution_set(solutions))
     self.assertEqual(3, len(solutions))
+
+  # isomorphic to n queens for n = 2 if we ignore the minor diagonal
+  def test_2_queens(self):
+    names = ["r0", "r1", "c0", "c1", "md", "d-", "d+"]
+    placements = [["r0", "c0", "md"],
+                  ["r0", "c1", "d+"],
+                  ["r1", "c0", "d-"],
+                  ["r1", "c1", "md"],
+                  ["md"],
+                  ["d+"],
+                  ["d-"]] # diagonals should be covered AT MOST once - these can bring it up to 1
+    sols = find_exact_cover_for_rows(names, placements)
+    self.assertEqual(1, len(sols))
