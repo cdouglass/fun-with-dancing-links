@@ -15,12 +15,15 @@ def n_queens(n):
 
 def solve_n_queens(n):
   solutions = get_all_solutions(n)
-  i = 1
+  print("FOUND {} solutions for n = {}!".format(len(solutions), n), sys.stderr)
+  i = 0 
   return solutions[i] if len(solutions) > i else []
 
+# TODO
 def generate_all_column_headers_and_matchers(n):
   return None
 
+# TODO
 def generate_all_possible_queen_positions_as_rows(n):
   return None
 
@@ -37,13 +40,8 @@ def get_all_solutions(n):
   col_matchers = [item[0] for item in column_matchers_with_ids]
   positions = flatten([[[x, y] for x in range(0, n)] for y in range(0, n)])
   rows = [[matcher(*pos) for matcher in col_matchers if matcher(*pos)] for pos in positions]
-  diags = [col_id("f_diag", m) for m in range(1 - n, n)] + [col_id("r_diag", m) for m in range(1 - n, n)] # TODO clean up (this is to allow diagonals to be covered by EITHER 1 or 0 actual queens)
-  print("rows below!", file=sys.stderr)
-  for r in rows:
-    print(r, file=sys.stderr)
+  diags = [col_id("f_diag", m) for m in range(1 - n, n)] + [col_id("r_diag", m) for m in range(1, 2 * n - 2)] # TODO clean up (this is to allow diagonals to be covered by EITHER 1 or 0 actual queens)
   solution_row_sets = lib.exact_cover.find_exact_cover_for_rows(col_headers, rows + diags)
-  print("solution row sets below!", file=sys.stderr)
-  print(solution_row_sets, file=sys.stderr)
   # TODO stop repeating
   solutions = [[row_to_position(row) for row in row_set if row_to_position(row)] for row_set in solution_row_sets]
   return solutions
@@ -72,17 +70,15 @@ def col_id(sym, m):
 # [col_id] -> [int, int]
 # TODO this is really repetitive
 def row_to_position(row):
-  if len(row) > 1:
-    x = [item.split(":")[1] for item in row if item.split(":")[0] == "col"][0]
-    y = [item.split(":")[1] for item in row if item.split(":")[0] == "row"][0]
-    return [int(x), int(y)]
+  # this is getting rows that list two diagonals and nothing else, wtf
+  cols = [item.split(":")[1] for item in row if item.split(":")[0] == "col"]
+  rows = [item.split(":")[1] for item in row if item.split(":")[0] == "row"]
+  if len(cols) > 0 and len(rows) > 0:
+    return [int(cols[0]), int(rows[0])]
   else:
     return None
 
 def position_list_to_board(points, n):
-  print("the following list of points is being made into a board", sys.stderr)
-  for p in points:
-    print(",".join(str(i) for i in p), sys.stderr)
   board = []
   for i in range(0, n):
     board += [[0] * n]
@@ -90,9 +86,6 @@ def position_list_to_board(points, n):
     x = point[0]
     y = point[1]
     board[y][x] = 1
-  print("and the board looks like this:", sys.stderr)
-  for r in board:
-    print(",".join(str(i) for i in r), sys.stderr)
   return board
 
 # stolen from SO
