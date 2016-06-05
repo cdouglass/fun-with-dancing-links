@@ -6,7 +6,7 @@ app = Flask(__name__)
 # use decorator to link a function to a url
 @app.route('/')
 def hello():
-  return "Hello World!"
+  return "Hello, World!"
 
 @app.route('/n_queens', methods=['GET', 'POST'])
 def n_queens():
