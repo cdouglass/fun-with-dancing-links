@@ -9,6 +9,7 @@ def queen_symbol():
 def format_board(board):
   return [[queen_symbol() if i else " " for i in row] for row in board]
 
+# only function here that any outside code should see
 def n_queens(n):
   solution = solve_n_queens(n)
   return format_board(position_list_to_board(solution, n))
@@ -21,7 +22,13 @@ def solve_n_queens(n):
 
 # TODO
 def generate_all_column_headers_and_matchers(n):
-  return None
+  pairs = [[column_matcher(m), col_id("col", m)] for m in range(0, n)] + \
+          [[row_matcher(m), col_id("row", m)] for m in range(0, n)] + \
+          [[forward_diag_matcher(m), col_id("f_diag", m)] for m in range(1 - n, n)] + \
+          [[reverse_diag_matcher(m), col_id("r_diag", m)] for m in range(1, 2 * n - 2)]
+  headers = [item[1] for item in pairs]
+  matchers = [item[0] for item in pairs]
+  return [headers, matchers]
 
 # TODO
 def generate_all_possible_queen_positions_as_rows(n):
@@ -32,12 +39,9 @@ def generate_all_possible_queen_positions_as_rows(n):
 def get_all_solutions(n):
   # TODO I don't like this! col_id shouldn't need to be called in two places
   # some of these diagonals are useless (just one square), oh well
-  column_matchers_with_ids = [[column_matcher(m), col_id("col", m)] for m in range(0, n)] + \
-                             [[row_matcher(m), col_id("row", m)] for m in range(0, n)] + \
-                             [[forward_diag_matcher(m), col_id("f_diag", m)] for m in range(1 - n, n)] + \
-                             [[reverse_diag_matcher(m), col_id("r_diag", m)] for m in range(1, 2 * n - 2)]
-  col_headers = [item[1] for item in column_matchers_with_ids]
-  col_matchers = [item[0] for item in column_matchers_with_ids]
+  column_matchers_and_headers = generate_all_column_headers_and_matchers(n)
+  col_headers = column_matchers_and_headers[0]
+  col_matchers = column_matchers_and_headers[1]
   positions = flatten([[[x, y] for x in range(0, n)] for y in range(0, n)])
   rows = [[matcher(*pos) for matcher in col_matchers if matcher(*pos)] for pos in positions]
   diags = [[col_id("f_diag", m)] for m in range(1 - n, n)] + [[col_id("r_diag", m)] for m in range(1, 2 * n - 2)] # TODO clean up (this is to allow diagonals to be covered by EITHER 1 or 0 actual queens)
@@ -51,10 +55,10 @@ def get_all_solutions(n):
 
 # misc helpers
 # TODO this is very repetitive
-def column_matcher(n):
+def row_matcher(n):
   return lambda x, y: col_id("col", n) if n == y else None
 
-def row_matcher(n):
+def column_matcher(n):
   return lambda x, y: col_id("row", n) if n == x else None
 
 # x-intercept
