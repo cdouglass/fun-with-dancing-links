@@ -40,7 +40,7 @@ def get_all_solutions(n):
   col_matchers = [item[0] for item in column_matchers_with_ids]
   positions = flatten([[[x, y] for x in range(0, n)] for y in range(0, n)])
   rows = [[matcher(*pos) for matcher in col_matchers if matcher(*pos)] for pos in positions]
-  diags = [col_id("f_diag", m) for m in range(1 - n, n)] + [col_id("r_diag", m) for m in range(1, 2 * n - 2)] # TODO clean up (this is to allow diagonals to be covered by EITHER 1 or 0 actual queens)
+  diags = [[col_id("f_diag", m)] for m in range(1 - n, n)] + [[col_id("r_diag", m)] for m in range(1, 2 * n - 2)] # TODO clean up (this is to allow diagonals to be covered by EITHER 1 or 0 actual queens)
   solution_row_sets = lib.exact_cover.find_exact_cover_for_rows(col_headers, rows + diags)
   # TODO stop repeating
   solutions = [[row_to_position(row) for row in row_set if row_to_position(row)] for row_set in solution_row_sets]

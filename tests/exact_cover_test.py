@@ -149,6 +149,11 @@ class TestMatrixOperations(unittest.TestCase):
     self.assertEqual(2, self.matrix.right.size)
     self.assertEqual(3, self.matrix.right.right.right.right.size)
 
+  def test_make_matrix_from_single_node_rows(self):
+    rows = [['a'], ['b'], ['c'], ['d'], ['e'], ['f'], ['g']]
+    matrix = make_matrix_from_rows(self.names, rows)
+    self.assertTrue(is_valid_matrix(matrix))
+
   def test_make_rows_from_matrix(self):
     rows = sorted(make_rows_from_matrix(self.matrix))
     self.assertEqual(rows, self.rows)
@@ -177,7 +182,7 @@ class TestAlgorithm(unittest.TestCase):
     find_exact_cover(matrix, solutions, [])
     self.assertEqual([], solutions)
 
-  def test_algorithm_on_simple_matrix(self):
+  def test_finds_solution_on_simple_matrix(self):
     solutions = []
     find_exact_cover(self.unique_solution_matrix, solutions, [])
     pretty_solutions = sorted([[sorted(row.get_column_names_for_row())
@@ -188,7 +193,7 @@ class TestAlgorithm(unittest.TestCase):
     rows = sorted(make_rows_from_matrix(self.unique_solution_matrix)) # confirm matrix unchanged
     self.assertEqual(rows, self.unique_solution_rows)
 
-  def test_multiple_solutions_on_matrix(self):
+  def test_finds_multiple_solutions_on_matrix(self):
     multiple_solutions_matrix = make_matrix_from_rows(self.names, self.multiple_solutions_rows)
     solutions = []
     find_exact_cover(multiple_solutions_matrix, solutions, [])
@@ -205,6 +210,11 @@ class TestAlgorithm(unittest.TestCase):
     solutions = find_exact_cover_for_rows(self.names, self.multiple_solutions_rows)
     self.assertEqual(self.expected_multiple_solutions, standardize_solution_set(solutions))
     self.assertEqual(3, len(solutions))
+
+  def test_finds_solution_for_rows_with_one_node_each(self):
+    row_list = [[name] for name in self.names]
+    solutions = find_exact_cover_for_rows(self.names, row_list)
+    self.assertEqual([row_list], standardize_solution_set(solutions)) 
 
   # isomorphic to n queens for n = 2 if we ignore the minor diagonal
   def test_2_queens(self):
