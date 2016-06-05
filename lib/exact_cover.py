@@ -50,7 +50,7 @@ class Node(Root):
     self.loop_through_circular_list(lambda x: x.right, lambda x: x.restore_vertically())
   # TODO doesn't include own column but should!
   def get_column_names_for_row(self):
-    return(self.loop_through_circular_list(lambda x: x.right, lambda x: x.column.name))
+    return [self.column.name] + self.loop_through_circular_list(lambda x: x.right, lambda x: x.column.name)
 
 class Column(Node):
   def __init__(self, name):
@@ -106,7 +106,7 @@ def find_exact_cover_for_rows(names, rows):
   solutions = []
   matrix = make_matrix_from_rows(names, rows)
   find_exact_cover(matrix, solutions)
-  return [[node.get_column_names_for_row() + [node.column.name] for node in sol] for sol in solutions]
+  return [[node.get_column_names_for_row() for node in sol] for sol in solutions]
 
 # Moving info in and out of matrices
 
@@ -144,10 +144,8 @@ def make_rows_from_matrix(matrix):
   while matrix.right != matrix:
     column = matrix.right
     if column.down != column:
-      name = column.name
-      rows_minus_this_column = column.loop_through_circular_list(lambda x: x.down, lambda x: x.get_column_names_for_row()) # doesn't get name of current_column, add that in next line
-      rows_for_this_column = [sorted(r + [name]) for r in rows_minus_this_column]
-      rows += rows_for_this_column
+      raw_rows = column.loop_through_circular_list(lambda x: x.down, lambda x: x.get_column_names_for_row())
+      rows += [sorted(r) for r in raw_rows]
     column.cover_column()
     columns.append(column)
   for column in columns[::-1]:

@@ -1,12 +1,9 @@
-#! /usr/bin/env python
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 
 from lib.exact_cover import *
-
 import unittest
-from functools import partial
 
 # Column -> bool
 def is_valid_column(column):
@@ -15,31 +12,33 @@ def is_valid_column(column):
   if not all([check_circularity(v_move, column) for v_move in vertical_moves]): # check column is circular both ways
     return False
   else: # moving downward, checks each row is circular both ways
-    return all(all(column.loop_through_circular_list(vertical_moves[0], partial(check_circularity, h_move))) for h_move in horizontal_moves)
+    return all(all(column.loop_through_circular_list(vertical_moves[0],
+                                                     lambda x: check_circularity(h_move, x)))
+              for h_move in horizontal_moves)
 
 # does not check name or size attributes
 # does not check that lists have same connections in each direction
 # Root -> bool
 def is_valid_matrix(matrix):
-  horizontal_moves = [lambda x: x.right, lambda x: x.left] # why the heck does this fail if I use left and right???
+  horizontal_moves = [lambda x: x.right, lambda x: x.left]
   for h_move in horizontal_moves:
-    if not check_circularity(h_move, matrix): # check circularity of headers
-      return False
-    if not all(matrix.loop_through_circular_list(h_move, is_valid_column)):
+    if not (check_circularity(h_move, matrix) and
+           all(matrix.loop_through_circular_list(h_move, is_valid_column))):
       return False
   return True
 
 # Root -> bool
-def check_circularity(move, node): # changed order to allow currying
-  def null_fn(*args): # silly
-    return None
+def check_circularity(move, node):
   try:
-    node.loop_through_circular_list(move, null_fn) # we don't care about fn here
+    node.loop_through_circular_list(move, lambda *args: None)
   except InvalidLooping:
     return False
   return True
 
-class TestHelperFunctions(unittest.TestCase):
+def standardize_solution_set(solutions):
+  return sorted([sorted([sorted(row) for row in sol]) for sol in solutions])
+
+class TestMatrixTestHelperFunctions(unittest.TestCase):
 
   def setUp(self):
     self.root = Root()
@@ -156,16 +155,21 @@ class TestMatrixOperations(unittest.TestCase):
     rows = sorted(make_rows_from_matrix(self.matrix)) # confirm matrix isn't changed in the process
     self.assertEqual(rows, self.rows)
 
-# given a problem formatted as a matrix, does it yield a proper solution?
 class TestAlgorithm(unittest.TestCase):
 
   def setUp(self):
     self.names = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
-    self.rows = [['a', 'd'], ['a', 'd', 'g'], ['b', 'c', 'f'],
+    self.unique_solution_rows = [['a', 'd'], ['a', 'd', 'g'], ['b', 'c', 'f'],
             ['b', 'g'], ['c', 'e', 'f'], ['d', 'e', 'g']]
-    self.matrix = make_matrix_from_rows(self.names, self.rows)
+    self.unique_solution_matrix = make_matrix_from_rows(self.names, self.unique_solution_rows)
+    self.unique_solution = [[['a', 'd'], ['b', 'g'], ['c', 'e', 'f']]]
+    self.multiple_solutions_rows = [['c', 'd', 'e'], ['a', 'f'], ['b', 'g'],
+                                    ['a', 'b'], ['f', 'g'], ['b', 'c', 'd', 'e', 'g']]
+    self.expected_multiple_solutions = [[['a', 'b'], ['c', 'd', 'e'], ['f', 'g']],
+                                        [['a', 'f'], ['b', 'c', 'd', 'e', 'g']],
+                                        [['a', 'f'], ['b', 'g'], ['c', 'd', 'e']]]
 
-  def test_impossible(self):
+  def test_algorithm_on_unsolvable_matrix(self):
     rows = [['a', 'd', 'f'], ['a', 'd', 'g'], ['b', 'c', 'f'],
             ['b', 'g'], ['c', 'e', 'f'], ['d', 'e', 'g']]
     matrix = make_matrix_from_rows(self.names, rows)
@@ -173,34 +177,31 @@ class TestAlgorithm(unittest.TestCase):
     find_exact_cover(matrix, solutions, [])
     self.assertEqual([], solutions)
 
-  def test_simple_case(self):
+  def test_algorithm_on_simple_matrix(self):
     solutions = []
-    find_exact_cover(self.matrix, solutions, [])
-    pretty_solutions = sorted([[sorted(row.get_column_names_for_row() + [row.column.name]) for row in solution] for solution in solutions])
-    self.assertEqual([[['a', 'd'], ['b', 'g'], ['c', 'e', 'f']]], pretty_solutions)
+    find_exact_cover(self.unique_solution_matrix, solutions, [])
+    pretty_solutions = sorted([[sorted(row.get_column_names_for_row())
+                                for row in solution]
+                              for solution in solutions])
+    self.assertEqual(self.unique_solution, pretty_solutions)
     self.assertEqual(1, len(solutions))
-    rows = sorted(make_rows_from_matrix(self.matrix)) # confirm matrix unchanged
-    self.assertEqual(rows, self.rows)
+    rows = sorted(make_rows_from_matrix(self.unique_solution_matrix)) # confirm matrix unchanged
+    self.assertEqual(rows, self.unique_solution_rows)
 
-  def test_multiple_solutions(self):
-    rows = [['c', 'd', 'e'], ['a', 'f'], ['b', 'g'],
-            ['a', 'b'], ['f', 'g'], ['b', 'c', 'd', 'e', 'g']]
-    multiple_solutions_matrix = make_matrix_from_rows(self.names, rows)
+  def test_multiple_solutions_on_matrix(self):
+    multiple_solutions_matrix = make_matrix_from_rows(self.names, self.multiple_solutions_rows)
     solutions = []
     find_exact_cover(multiple_solutions_matrix, solutions, [])
-    pretty_solutions = sorted([[sorted(row.get_column_names_for_row() + [row.column.name]) for row in solution] for solution in solutions])
-    self.assertEqual([[['a', 'b'], ['c', 'd', 'e'], ['f', 'g']], [['a', 'f'], ['b', 'c', 'd', 'e', 'g']], [['a', 'f'], ['b', 'g'], ['c', 'd', 'e']]], pretty_solutions)
+    solutions_as_row_lists = [[row.get_column_names_for_row() for row in sol] for sol in solutions]
+    self.assertEqual(self.expected_multiple_solutions, standardize_solution_set(solutions_as_row_lists))
     self.assertEqual(3, len(solutions))
 
-class TestIntegration(unittest.TestCase):
-  def setUp(self):
-    self.names = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
-    self.rows = [['a', 'd'], ['a', 'd', 'g'], ['b', 'c', 'f'],
-            ['b', 'g'], ['c', 'e', 'f'], ['d', 'e', 'g']]
-
-  # TODO method for sorting solutions neatly
-  def test_simple_case(self):
-    solutions = find_exact_cover_for_rows(self.names, self.rows)
-    sorted_solutions = [sorted([sorted(row) for row in sol]) for sol in solutions]
-    self.assertEqual([[['a', 'd'], ['b', 'g'], ['c', 'e', 'f']]], sorted_solutions)
+  def test_finds_solution_for_simple_row_set(self):
+    solutions = find_exact_cover_for_rows(self.names, self.unique_solution_rows)
+    self.assertEqual(self.unique_solution, standardize_solution_set(solutions))
     self.assertEqual(1, len(solutions))
+
+  def test_finds_multiple_solutions_for_row_set(self):
+    solutions = find_exact_cover_for_rows(self.names, self.multiple_solutions_rows)
+    self.assertEqual(self.expected_multiple_solutions, standardize_solution_set(solutions))
+    self.assertEqual(3, len(solutions))
