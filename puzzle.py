@@ -1,5 +1,6 @@
-import lib.n_queens
+import os
 import flask
+import lib.n_queens
 app = flask.Flask(__name__)
 
 # use decorator to link a function to a url
@@ -14,4 +15,5 @@ def n_queens():
   return flask.render_template('n_queens.html', solutions = solutions, n = n)
 
 if __name__ == "__main__":
-  app.run()
+  port = int(os.environ.get("PORT", 5000))
+  app.run(port=port)
