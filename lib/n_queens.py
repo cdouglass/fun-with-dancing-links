@@ -1,16 +1,10 @@
 import lib.exact_cover
  
-def queen_symbol():
-  return '♕'
-
-def format_board(board):
-  return [[queen_symbol() if i else " " for i in row] for row in board]
-
 # only function here that any outside code should see
 def n_queens(n):
   solutions = solve_n_queens(n)
   position_lists = solutions if len(solutions) > 0 else [[]]
-  return [format_board(position_list_to_board(pl, n)) for pl in position_lists]
+  return [position_list_to_board(pl, n) for pl in position_lists]
 
 def generate_all_column_headers(n):
   return  [col_id("col", m) for m in range(0, n)] + \

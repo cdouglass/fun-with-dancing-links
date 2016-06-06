@@ -16,6 +16,6 @@ h1 {
   text-align: center;
 }
 
-form {
-  margin: 2em;
+form, nav {
+  margin: 1em;
 }

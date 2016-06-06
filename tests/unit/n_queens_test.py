@@ -89,13 +89,13 @@ class testEndpoint(unittest.TestCase):
 
   def test_n_queens_with_no_solutions(self):
     result = n_queens(3)
-    self.assertEqual([' '] * 9, flatten(flatten(result)))
+    self.assertEqual([0] * 9, flatten(flatten(result)))
 
   def test_n_queens_with_two_solutions(self):
     solution = n_queens(4)[0]
-    expected = [' '] * 16
+    expected = [0] * 16
     for i in [2, 4, 11, 13]:
-      expected[i] = queen_symbol()
+      expected[i] = 1
     self.assertEqual(expected, flatten(solution))
 
 class testSolvers(unittest.TestCase):

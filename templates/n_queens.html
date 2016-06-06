@@ -5,9 +5,6 @@
     <link rel="stylesheet" type="text/css" href="../static/css/reset.css">
     <link rel="stylesheet" type="text/css" href="../static/css/style.css">
     <link rel="stylesheet" type="text/css" href="../static/css/chess.css">
-    <script>var solutions = {{ solutions|tojson }};</script>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
-    <script type="text/javascript" src="../static/js/n_queens.js"></script>
     <title>N Queens Puzzle</title>
   </head>
   <body>
@@ -17,16 +14,25 @@
         {% set solution = solutions[0] %}
         {% for row in solution %}
           <div class='row'>
+          {% set row_num = loop.index - 1 %}
           {% for v in row %}
-            <div class='square'>{{v}}</div>
+            <div class="square" id="{{ loop.index - 1 }}-{{row_num}}">{{ '♕' if v else ' ' }}</div>
           {% endfor %}
           </div>
         {% endfor %}
       </div>
+      <nav>
+        <button id="prev">&lt;&lt;</button>
+        <span id="solution_count">Showing solution <span id="index">1</span> of {{solutions|length}}</span>
+        <button id="next">&gt;&gt;</button>
+      </nav>
+      <form action="/n_queens" method="post">
+        <input type="number" name="count">
+        <input type="submit" name="submit" value="Submit!">
+      </form>
     </div>
-    <form action="/n_queens" method="post">
-      <input type="number" name="count">
-      <input type="submit" name="submit" value="Submit!">
-    </form>
+    <script>var solutions = {{ solutions|tojson }}, index = 0;</script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+    <script type="text/javascript" src="../static/js/n_queens.js"></script>
   </body>
 </html>
