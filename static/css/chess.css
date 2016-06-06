@@ -28,15 +28,15 @@
 
 .row {
   height: 30px;
-  background-color: whitesmoke;
+  background-color: gray;
 }
 
 .row:nth-child(even) .square:nth-child(even) {
-  background-color: gray;
+  background-color: whitesmoke;
 }
 
 .row:nth-child(odd) .square:nth-child(odd) {
-  background-color: gray;
+  background-color: whitesmoke;
 }
 
 .square {
