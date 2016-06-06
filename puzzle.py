@@ -9,9 +9,9 @@ def hello():
 
 @app.route('/n_queens', methods=['GET', 'POST'])
 def n_queens():
-  n = 2 if flask.request.method == 'GET' else int(flask.request.form['count'])
+  n = 2 if flask.request.method == 'GET' else int(flask.request.form['board_size'])
   solutions = lib.n_queens.n_queens(n)
-  return flask.render_template('n_queens.html', solutions=solutions)
+  return flask.render_template('n_queens.html', solutions = solutions, n = n)
 
 if __name__ == "__main__":
   app.run()

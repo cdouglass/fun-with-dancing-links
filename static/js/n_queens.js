@@ -7,10 +7,12 @@ $("nav button").on('click', function() {
 });
 
 function goToNewSolution(n) {
-  index = n;
-  solution = solutions[index];
-  $("#index").text(index + 1);
-  drawSolution(solution);
+  if (solutions.length > 0) {
+    index = n;
+    solution = solutions[index];
+    $("#index").text(index + 1);
+    drawSolution(solution);
+  }
 }
 
 function drawSolution(soln) {

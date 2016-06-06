@@ -3,7 +3,7 @@ import lib.exact_cover
 # only function here that any outside code should see
 def n_queens(n):
   solutions = solve_n_queens(n)
-  position_lists = solutions if len(solutions) > 0 else [[]]
+  position_lists = solutions if len(solutions) > 0 else []
   return [position_list_to_board(pl, n) for pl in position_lists]
 
 def generate_all_column_headers(n):

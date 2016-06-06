@@ -89,7 +89,7 @@ class testEndpoint(unittest.TestCase):
 
   def test_n_queens_with_no_solutions(self):
     result = n_queens(3)
-    self.assertEqual([0] * 9, flatten(flatten(result)))
+    self.assertEqual([], result)
 
   def test_n_queens_with_two_solutions(self):
     solution = n_queens(4)[0]
