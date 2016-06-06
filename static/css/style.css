@@ -1,0 +1,21 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  text-align: center;
+}
+
+h1 {
+  margin: 20px;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+#container {
+  text-align: center;
+}
+
+form {
+  margin: 2em;
+}

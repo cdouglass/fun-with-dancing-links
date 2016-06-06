@@ -11,7 +11,6 @@ class Root:
     column.left     = self
     self.right.left = column
     self.right      = column
-# TODO this way of passing functions to loop_through_circular_list is... ick. Can I replace this somehow?
 # does NOT apply fn to given node - ONLY to rest in its loop!
 # Root, (fn(Root) -> Root), (fn(Root, [Root]) -> T) -> [T]
   def loop_through_circular_list(self, move, fn):
@@ -21,7 +20,7 @@ class Root:
     while current_node != self:
       if current_node is None or current_node in visited_nodes:
         raise InvalidLooping
-      results.append(fn(current_node)) # ugh
+      results.append(fn(current_node))
       visited_nodes.append(current_node)
       current_node = move(current_node)
     return results
@@ -86,7 +85,7 @@ def find_exact_cover(matrix, full_solutions = [], partial_solution = []):
   elif matrix.right.up == matrix.right:
     partial_solution == [] # terminate unsuccessfully
   else:
-    column = matrix.right # TODO improve by picking column with fewest elements instead
+    column = matrix.right
     column.cover_column()
     rows_in_column = column.loop_through_circular_list(lambda x: x.down, lambda x: x) # [Node]
     for row in rows_in_column:

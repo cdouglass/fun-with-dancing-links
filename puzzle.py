@@ -1,30 +1,20 @@
-import lib.my_math
 import lib.n_queens
-from flask import Flask, render_template, request
-app = Flask(__name__)
+import flask
+app = flask.Flask(__name__)
 
 # use decorator to link a function to a url
 @app.route('/')
 def hello():
-  return "Hello, World!"
+  return flask.redirect('/n_queens')
 
 @app.route('/n_queens', methods=['GET', 'POST'])
 def n_queens():
-  if request.method == 'GET':
-    return render_template('n_queens_form.html')
+  if flask.request.method == 'GET':
+    solutions = []
   else:
-    n = int(request.form['count'])
+    n = int(flask.request.form['count'])
     solutions = lib.n_queens.n_queens(n)
-    return render_template('n_queens_result.html', solutions=solutions)
-
-@app.route('/square', methods=['GET', 'POST'])
-def square():
-  if request.method == 'GET':
-    return render_template('square_form.html')
-  else:
-    num = int(request.form['argument'])
-    result = lib.my_math.square(num)
-    return render_template('square_result.html', result=result)
+  return flask.render_template('n_queens.html', solutions=solutions)
 
 if __name__ == "__main__":
-  app.run(debug=True) # TODO turn off debug in production!
+  app.run()

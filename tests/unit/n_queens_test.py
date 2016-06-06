@@ -18,7 +18,7 @@ class TestMatchers(unittest.TestCase):
     self.assertFalse(matcher(2, 0))
 
   def test_forward_diagonal_matcher_major_diagonal(self):
-    matcher = forward_diag_matcher(0) # major diagonal
+    matcher = forward_diag_matcher(0)
     self.assertTrue(matcher(0, 0))
     self.assertTrue(matcher(8, 8))
     self.assertFalse(matcher(8, 7))
