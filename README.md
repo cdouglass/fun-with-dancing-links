@@ -1,4 +1,4 @@
-Setup:
+Initial setup:
 * `sudo apt-get install python3`
 * `sudo apt-get install python3-pip`
 * `sudo apt-get install python3-venv`
@@ -8,6 +8,12 @@ Setup:
 * `pip install Flask`
 * `python3 app.py`
 * Site will be running at http://localhost:5000
+
+Setup every other time:
+```
+`python3 -m venv env`
+`source env/bin/activate
+```
 
 Running the tests:
 ```

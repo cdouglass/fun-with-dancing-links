@@ -1,5 +1,3 @@
-import sys
-
 class InvalidLooping(Exception):
   def __init__(self):
     Exception.__init__(self)
