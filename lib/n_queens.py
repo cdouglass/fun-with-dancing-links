@@ -11,14 +11,9 @@ def format_board(board):
 
 # only function here that any outside code should see
 def n_queens(n):
-  solution = solve_n_queens(n)
-  return format_board(position_list_to_board(solution, n))
-
-def solve_n_queens(n):
-  solutions = get_all_solutions(n)
-  print("FOUND {} solutions for n = {}!".format(len(solutions), n), sys.stderr)
-  i = 0 
-  return solutions[i] if len(solutions) > i else []
+  solutions = solve_n_queens(n)
+  position_lists = solutions if len(solutions) > 0 else [[]]
+  return [format_board(position_list_to_board(pl, n)) for pl in position_lists]
 
 # TODO
 def generate_all_column_headers_and_matchers(n):
@@ -36,7 +31,7 @@ def generate_all_possible_queen_positions_as_rows(n):
 
 # TODO this ought to be broken up into more separate functions
 # int -> [[[str]]] ie array of solutions, each of which is represented as an array of rows
-def get_all_solutions(n):
+def solve_n_queens(n):
   # TODO I don't like this! col_id shouldn't need to be called in two places
   # some of these diagonals are useless (just one square), oh well
   column_matchers_and_headers = generate_all_column_headers_and_matchers(n)

@@ -14,8 +14,8 @@ def n_queens():
     return render_template('n_queens_form.html')
   else:
     n = int(request.form['count'])
-    result = lib.n_queens.n_queens(n)
-    return render_template('n_queens_result.html', result=result)
+    solutions = lib.n_queens.n_queens(n)
+    return render_template('n_queens_result.html', solutions=solutions)
 
 @app.route('/square', methods=['GET', 'POST'])
 def square():
