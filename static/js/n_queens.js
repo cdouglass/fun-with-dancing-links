@@ -1,4 +1,5 @@
 // solution, index are already global from template
+var index = $('#index').text();
 
 $("nav button").on('click', function() {
   var delta = (this.id == 'prev') ? -1 : 1,

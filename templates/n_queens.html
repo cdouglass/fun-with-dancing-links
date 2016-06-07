@@ -25,15 +25,15 @@
       </div>
       <nav>
         <button id="prev">&lt;&lt;</button>
-        <span id="solution_count">Showing solution <span id="index">{{0 if (solutions|length == 0) else 1}}</span> of {{solutions|length}}</span> for {{n}} queens.
+        Showing solution <span id="index">{{0 if (solutions|length == 0) else 1}}</span> of <span id="solution_count">{{solutions|length}}</span> for <span id="n">{{n}}</span> queens.
         <button id="next">&gt;&gt;</button>
       </nav>
       <form action="/n_queens" method="post">
-        <input type="number" name="board_size" value="8">
+        <input type="number" name="board_size" value="4">
         <input type="submit" name="submit" value="Set board size">
       </form>
     </div>
-    <script>var solutions = {{ solutions|tojson }}, index = 0;</script>
+    <script>var solutions = {{ solutions|tojson }};</script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
     <script type="text/javascript" src="../static/js/n_queens.js"></script>
   </body>
