@@ -29,8 +29,8 @@
         <button id="next">&gt;&gt;</button>
       </nav>
     </div>
-    <form action="/n_queens" method="post">
-      <input type="number" name="board_size" value="4">
+    <form action="/n_queens" method="get">
+      <input type="number" name="board_size" value={{n}}>
       <input type="submit" name="submit" value="Set board size">
     </form>
     <script>var solutions = {{ solutions|tojson }};</script>

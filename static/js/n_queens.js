@@ -8,25 +8,23 @@ $('nav button').on('click', function() {
 });
 
 $('form').on('submit', function(event) {
-  var board_size = $('input[name="board_size"]').val();
+  var boardSize = $('input[name="board_size"]').val(),
+    queryString = '?n=' + boardSize;
+  location.assign('/n_queens' + queryString);
   event.preventDefault();
-  $.ajax('/n_queens', {method: 'POST', data: 'board_size=' + board_size}).done(function(response) {
+  $.ajax('/n_queens_board_only' + queryString).done(function(response) {
     // not replacing whole container as that would break nav buttons
-    var board = $($.parseHTML(response)).find('#board');
-    $('#board').replaceWith(board);
-    var solutions_info = $($.parseHTML(response)).find('#solutions-info');
-    $('#solutions-info').replaceWith(solutions_info);
-    $.ajax('/n_queens_solutions_only', {
-      method: 'POST',
-      data: 'board_size=' + board_size
-    }).done(function(response) {
+    $('#board').replaceWith($($.parseHTML(response)).find('#board'));
+    $('#solutions-info').replaceWith($($.parseHTML(response)).find('#solutions-info'));
+    $.ajax('/n_queens_solutions_only' + queryString).done(function(response) {
       pollBackgroundTask(response['Location'], response['task_id']);
     });
   });
 });
 
-function pollBackgroundTask(response_url, task_id) {
-  $.getJSON(response_url, {task_id: task_id}, function(data) {
+// TODO spinner?
+function pollBackgroundTask(responseUrl, taskId) {
+  $.getJSON(responseUrl, {task_id: taskId}, function(data) {
     if ('result' in data && data['result']['status'] != 'PENDING') {
       solutions = data['result']; // global
       $('#solution_count').text(solutions.length);
@@ -35,7 +33,7 @@ function pollBackgroundTask(response_url, task_id) {
       }
     } else {
       setTimeout(function() {
-        pollBackgroundTask(response_url, task_id);
+        pollBackgroundTask(responseUrl, taskId);
       }, 2000);
     }
   });
@@ -44,7 +42,6 @@ function pollBackgroundTask(response_url, task_id) {
 function goToNewSolution(n) {
   if (solutions.length > 0) {
     index = n % solutions.length;
-    console.log('going to new solution with index ' + index)
     solution = solutions[index];
     $('#index').text(index + 1);
     drawSolution(solution);

@@ -1,6 +1,6 @@
 import os
 import flask
-import time # TODO remove
+from flask import request
 from celery import Celery
 import lib.n_queens
 
@@ -14,26 +14,32 @@ celery.conf.update(app.config)
 def solve_n_queens_in_background(n):
   return lib.n_queens.n_queens(n)
 
-# use decorator to link a function to a url
 @app.route('/')
 def hello():
   return flask.redirect('/n_queens')
 
-@app.route('/n_queens', methods=['GET', 'POST'])
-def n_queens():
-  n = int(flask.request.form['board_size']) if flask.request.form else 4
-  solutions = lib.n_queens.n_queens(n) if flask.request.method == 'GET' else []
+@app.route('/n_queens')
+def n_queens_default():
+  args = request.args
+  n = int(args['n']) if args else 4
+  solutions = lib.n_queens.n_queens(n)
   return flask.render_template('n_queens.html', solutions = solutions, n = n)
 
-@app.route('/n_queens_solutions_only', methods=['POST'])
+# TODO feel like this doesn't deserve its own route
+@app.route('/n_queens_board_only')
+def n_queens_board_only():
+  n = int(request.args['n'])
+  return flask.render_template('n_queens.html', solutions = [], n = n)
+
+@app.route('/n_queens_solutions_only')
 def n_queens_solutions_only():
-  n = int(flask.request.form['board_size'])
+  n = int(request.args['n'])
   task = solve_n_queens_in_background.delay(n)
-  return flask.jsonify(Location=flask.url_for('n_queens_task'), task_id=task.id), 200
+  return flask.jsonify(Location=flask.url_for('n_queens_background_task'), task_id=task.id), 200
 
 @app.route('/n_queens_task')
-def n_queens_task():
-  task_id = flask.request.args.get('task_id')
+def n_queens_background_task():
+  task_id = request.args.get('task_id')
   task = solve_n_queens_in_background.AsyncResult(task_id)
   response = {}
   if task.state != 'PENDING':
