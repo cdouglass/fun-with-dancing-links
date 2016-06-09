@@ -25,11 +25,10 @@ def n_queens_default():
   solutions = lib.n_queens.n_queens(n)
   return flask.render_template('n_queens.html', solutions = solutions, n = n)
 
-# TODO feel like this doesn't deserve its own route
 @app.route('/n_queens_board_only')
 def n_queens_board_only():
   n = int(request.args['n'])
-  return flask.render_template('n_queens.html', solutions = [], n = n)
+  return flask.render_template('n_queens_container.html', solutions = [], n = n)
 
 @app.route('/n_queens_solutions_only')
 def n_queens_solutions_only():

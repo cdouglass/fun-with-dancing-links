@@ -19,6 +19,6 @@ h1, h2 {
   text-align: center;
 }
 
-form, nav {
+form, nav, p {
   margin: 1em;
 }

@@ -10,22 +10,24 @@ $('nav button').on('click', function() {
 $('form').on('submit', function(event) {
   var boardSize = $('input[name="board_size"]').val(),
     queryString = '?n=' + boardSize;
-  location.assign('/n_queens' + queryString);
+  //location.assign('/n_queens' + queryString); // TODO can I assign location without actually sending a GET request and thereby defeatin ght entire purpose of this ajax shit?
   event.preventDefault();
   $.ajax('/n_queens_board_only' + queryString).done(function(response) {
     // not replacing whole container as that would break nav buttons
     $('#board').replaceWith($($.parseHTML(response)).find('#board'));
     $('#solutions-info').replaceWith($($.parseHTML(response)).find('#solutions-info'));
     $.ajax('/n_queens_solutions_only' + queryString).done(function(response) {
-      pollBackgroundTask(response['Location'], response['task_id']);
+      console.log('hi');
+      pollBackgroundTask(response['Location'], response['task_id'], 100);
     });
   });
 });
 
-// TODO spinner?
-function pollBackgroundTask(responseUrl, taskId) {
+function pollBackgroundTask(responseUrl, taskId, timeOut) {
+  console.log('polling at ' + Date.now());
   $.getJSON(responseUrl, {task_id: taskId}, function(data) {
     if ('result' in data && data['result']['status'] != 'PENDING') {
+      console.log('REQUEST COMPLETED');
       solutions = data['result']; // global
       $('#solution_count').text(solutions.length);
       if(solutions.length > 0) {
@@ -34,7 +36,7 @@ function pollBackgroundTask(responseUrl, taskId) {
     } else {
       setTimeout(function() {
         pollBackgroundTask(responseUrl, taskId);
-      }, 2000);
+      }, timeOut * 1.5);
     }
   });
 }

@@ -8,29 +8,13 @@
     <title>N Queens Puzzle</title>
   </head>
   <body>
-    <div id="container">
-      <h1>N Queens Puzzle</h1>
-      <div id="board" class="grid">
-        {% set solution = solutions[0] %}
-        {% set default_matrix = [[0] * n] * n %}
-        {% set matrix = (default_matrix if (solutions|length == 0) else solution) %}
-        {% for row in matrix %}
-          <div class='row'>
-          {% set row_num = loop.index - 1 %}
-          {% for v in row %}
-            <div class="square" id="{{ loop.index - 1 }}-{{row_num}}">{{ '♕' if v else ' ' }}</div>
-          {% endfor %}
-          </div>
-        {% endfor %}
-      </div>
-      <nav>
-        <button id="prev">&lt;&lt;</button>
-        <span id="solutions-info">Showing solution <span id="index">{{0 if (solutions|length == 0) else 1}}</span> of <span id="solution_count">{{solutions|length}}</span> for <span id="n">{{n}}</span> queens.</span>
-        <button id="next">&gt;&gt;</button>
-      </nav>
-    </div>
+    {% include 'n_queens_container.html' %}
+    <nav>
+      <button id="prev">&lt;&lt;</button>
+      <button id="next">&gt;&gt;</button>
+    </nav>
     <form action="/n_queens" method="get">
-      <input type="number" name="board_size" value={{n}}>
+      <input type="number" name="n" value={{n}}>
       <input type="submit" name="submit" value="Set board size">
     </form>
     <script>var solutions = {{ solutions|tojson }};</script>

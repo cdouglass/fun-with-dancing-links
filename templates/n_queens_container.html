@@ -1,0 +1,17 @@
+<div id="container">
+  <h1>N Queens Puzzle</h1>
+  <div id="board" class="grid">
+    {% set solution = solutions[0] %}
+    {% set default_matrix = [[0] * n] * n %}
+    {% set matrix = (default_matrix if (solutions|length == 0) else solution) %}
+    {% for row in matrix %}
+      <div class='row'>
+      {% set row_num = loop.index - 1 %}
+      {% for v in row %}
+        <div class="square" id="{{ loop.index - 1 }}-{{row_num}}">{{ '♕' if v else ' ' }}</div>
+      {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+  <p id="solutions-info">Showing solution <span id="index">{{0 if (solutions|length == 0) else 1}}</span> of <span id="solution_count">{{solutions|length}}</span> for <span id="n">{{n}}</span> queens.</p>
+</div>

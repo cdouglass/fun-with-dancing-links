@@ -33,12 +33,12 @@ class NQueensIntegrationTests(unittest.TestCase):
     self.assertEqual('2', fields["solution_count"])
     self.assertEqual('4', fields["n"])
 
-  def testNQueensPostSucceeds(self):
-    response = self.app.post('/n_queens', data = {'board_size': '6'})
+  def testNQueensWithQueryStringSucceeds(self):
+    response = self.app.get('/n_queens?n=6')
     self.assertEqual(200, response.status_code)
 
   def testNQueensShowsNewSolutionsOnSettingBoardSize(self):
-    response = self.app.post('/n_queens', data = {'board_size': '6'})
+    response = self.app.get('/n_queens?n=6')
     body = BeautifulSoup(response.data, 'html.parser') # BS assumes byte strings are UTF-8
     fields = get_contents_of_ids(body, ["index", "solution_count", "n"])
     self.assertEqual('1', fields["index"])
