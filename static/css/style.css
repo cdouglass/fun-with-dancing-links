@@ -22,3 +22,9 @@ h1, h2 {
 form, nav, p {
   margin: 1em;
 }
+
+.disabled, .disabled:hover {
+  color: #BBB;
+  background-color: lightgray;
+  border-width: 1px;
+}

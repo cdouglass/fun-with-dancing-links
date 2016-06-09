@@ -10,8 +10,8 @@
   <body>
     {% include 'n_queens_container.html' %}
     <nav>
-      <button id="prev">&lt;&lt;</button>
-      <button id="next">&gt;&gt;</button>
+      <button id="prev" class='disabled'>&lt;&lt;</button>
+      <button id="next" class='disabled'>&gt;&gt;</button>
     </nav>
     <form action="/n_queens" method="get">
       <input type="number" name="n" value={{n}}>

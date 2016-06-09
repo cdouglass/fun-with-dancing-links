@@ -1,6 +1,10 @@
 // solution, index are already global from template
 var index = 0;
 
+$(document).ready(function() {
+  $('nav button').removeClass('disabled');
+});
+
 $('nav button').on('click', function() {
   var delta = (this.id == 'prev') ? -1 : 1,
     nextIndex = index + delta + solutions.length;
@@ -8,7 +12,7 @@ $('nav button').on('click', function() {
 });
 
 $('form').on('submit', function(event) {
-  var boardSize = $('input[name="board_size"]').val(),
+  var boardSize = $('input[name="n"]').val(),
     queryString = '?n=' + boardSize;
   //location.assign('/n_queens' + queryString); // TODO can I assign location without actually sending a GET request and thereby defeatin ght entire purpose of this ajax shit?
   event.preventDefault();
