@@ -10,7 +10,7 @@
   <body>
     <div id="container">
       <h1>N Queens Puzzle</h1>
-      <div class="grid">
+      <div id="board" class="grid">
         {% set solution = solutions[0] %}
         {% set default_matrix = [[0] * n] * n %}
         {% set matrix = (default_matrix if (solutions|length == 0) else solution) %}
@@ -25,14 +25,14 @@
       </div>
       <nav>
         <button id="prev">&lt;&lt;</button>
-        Showing solution <span id="index">{{0 if (solutions|length == 0) else 1}}</span> of <span id="solution_count">{{solutions|length}}</span> for <span id="n">{{n}}</span> queens.
+        <span id="solutions-info">Showing solution <span id="index">{{0 if (solutions|length == 0) else 1}}</span> of <span id="solution_count">{{solutions|length}}</span> for <span id="n">{{n}}</span> queens.</span>
         <button id="next">&gt;&gt;</button>
       </nav>
-      <form action="/n_queens" method="post">
-        <input type="number" name="board_size" value="4">
-        <input type="submit" name="submit" value="Set board size">
-      </form>
     </div>
+    <form action="/n_queens" method="post">
+      <input type="number" name="board_size" value="4">
+      <input type="submit" name="submit" value="Set board size">
+    </form>
     <script>var solutions = {{ solutions|tojson }};</script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
     <script type="text/javascript" src="../static/js/n_queens.js"></script>

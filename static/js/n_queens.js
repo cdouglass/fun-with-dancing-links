@@ -1,28 +1,50 @@
 // solution, index are already global from template
-var index = $('#index').text();
+var index = 0;
 
 $('nav button').on('click', function() {
   var delta = (this.id == 'prev') ? -1 : 1,
-    nextIndex = (index + delta + solutions.length) % solutions.length;
+    nextIndex = index + delta + solutions.length;
   goToNewSolution(nextIndex);
 });
 
 $('form').on('submit', function(event) {
-  console.log("hi!!!");
+  var board_size = $('input[name="board_size"]').val();
   event.preventDefault();
-  $.ajax('/n_queens', {
-    method: 'POST',
-    data: 'board_size=' + $('input[name="board_size"]').val()
-  }).done(function(response) {
-    document.open();
-    document.write(response);
-    document.close();
-  }); // TODO get a smaller response and don't reload everything
+  $.ajax('/n_queens', {method: 'POST', data: 'board_size=' + board_size}).done(function(response) {
+    // not replacing whole container as that would break nav buttons
+    var board = $($.parseHTML(response)).find('#board');
+    $('#board').replaceWith(board);
+    var solutions_info = $($.parseHTML(response)).find('#solutions-info');
+    $('#solutions-info').replaceWith(solutions_info);
+    $.ajax('/n_queens_solutions_only', {
+      method: 'POST',
+      data: 'board_size=' + board_size
+    }).done(function(response) {
+      pollBackgroundTask(response['Location'], response['task_id']);
+    });
+  });
 });
+
+function pollBackgroundTask(response_url, task_id) {
+  $.getJSON(response_url, {task_id: task_id}, function(data) {
+    if ('result' in data && data['result']['status'] != 'PENDING') {
+      solutions = data['result']; // global
+      $('#solution_count').text(solutions.length);
+      if(solutions.length > 0) {
+        goToNewSolution(0)
+      }
+    } else {
+      setTimeout(function() {
+        pollBackgroundTask(response_url, task_id);
+      }, 2000);
+    }
+  });
+}
 
 function goToNewSolution(n) {
   if (solutions.length > 0) {
-    index = n;
+    index = n % solutions.length;
+    console.log('going to new solution with index ' + index)
     solution = solutions[index];
     $('#index').text(index + 1);
     drawSolution(solution);

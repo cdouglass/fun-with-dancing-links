@@ -21,15 +21,26 @@ def hello():
 
 @app.route('/n_queens', methods=['GET', 'POST'])
 def n_queens():
-  n = 4 if flask.request.method == 'GET' else int(flask.request.form['board_size'])
-  if n < 5: # TODO don't have hard-coded cutoff (but if no better idea, change it to 12 in prod)
-    solutions = lib.n_queens.n_queens(n)
-  else:
-    task = solve_n_queens_in_background.delay(n)
-    while not(task.result):
-      time.sleep(0.1) # TODO this still needs to be moved OUT of the request or heroku will time it out
-    solutions = task.result
+  n = int(flask.request.form['board_size']) if flask.request.form else 4
+  solutions = lib.n_queens.n_queens(n) if flask.request.method == 'GET' else []
   return flask.render_template('n_queens.html', solutions = solutions, n = n)
+
+@app.route('/n_queens_solutions_only', methods=['POST'])
+def n_queens_solutions_only():
+  n = int(flask.request.form['board_size'])
+  task = solve_n_queens_in_background.delay(n)
+  return flask.jsonify(Location=flask.url_for('n_queens_task'), task_id=task.id), 200
+
+@app.route('/n_queens_task')
+def n_queens_task():
+  task_id = flask.request.args.get('task_id')
+  task = solve_n_queens_in_background.AsyncResult(task_id)
+  response = {}
+  if task.state != 'PENDING':
+    response['result'] = task.result
+  else:
+    response['result'] = {'status': 'PENDING'}
+  return flask.jsonify(response)
 
 if __name__ == "__main__":
   port = int(os.environ.get("PORT", 5000))
