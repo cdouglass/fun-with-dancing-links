@@ -1,6 +1,18 @@
 // solution, index are already global from template
 var index = 0;
 
+$(window).bind('popstate', function(event) {
+  var url = location.href,
+    queryString = '?' + url.split('?')[1];
+  $.ajax('/n_queens_board_only' + queryString).done(function(response) {
+    $('#container').replaceWith($($.parseHTML(response)).filter('#container'));
+    $('#solutions-info').css('opacity', 0);
+    $.ajax('/n_queens_solutions_only' + queryString).done(function(response) {
+      pollBackgroundTask(response['Location'], response['task_id']);
+    });
+  });
+});
+
 $(document).on('ajaxStart', function() {
   $('#spinner').animate({opacity: 1}, 400).animate({opacity: 0}, 400);
 });
@@ -19,10 +31,10 @@ $('form').on('submit', function(event) {
   var boardSize = $('input[name="n"]').val(),
     queryString = '?n=' + boardSize;
   event.preventDefault();
+  history.pushState({}, '', '/n_queens' + queryString);
   $.ajax('/n_queens_board_only' + queryString).done(function(response) {
-    $('#board').replaceWith($($.parseHTML(response)).find('#board'));
-    $('#solutions-info').replaceWith($($.parseHTML(response)).find('#solutions-info'));
-    $('#solutions-info').hide();
+    $('#container').replaceWith($($.parseHTML(response)).filter('#container'));
+    $('#solutions-info').css('opacity', 0);
     $.ajax('/n_queens_solutions_only' + queryString).done(function(response) {
       pollBackgroundTask(response['Location'], response['task_id']);
     });
@@ -34,7 +46,8 @@ function pollBackgroundTask(responseUrl, taskId) {
     if ('result' in data && data['result']['status'] != 'PENDING') {
       solutions = data['result']; // global
       $('#solution_count').text(solutions.length);
-      $('#solutions-info').delay(400).show(1); // arg to show makes it into an animation, which lets delay affect it, which prevents this from showing before spinner has faded
+      $('#solutions-info').delay(600).animate({opacity: 1}); // arg to show makes it into an animation, which lets delay affect it, which prevents this from showing before spinner has faded
+      $('nav button').removeClass('disabled');
       if(solutions.length > 0) {
         goToNewSolution(0)
       }
