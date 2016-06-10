@@ -30,6 +30,7 @@ $('nav button').on('click', function() {
 $('form').on('submit', function(event) {
   var boardSize = $('input[name="n"]').val(),
     queryString = '?n=' + boardSize;
+  solutions = [];
   event.preventDefault();
   history.pushState({}, '', '/n_queens' + queryString);
   $.ajax('/n_queens_board_only' + queryString).done(function(response) {
