@@ -1,6 +1,10 @@
 // solution, index are already global from template
 var index = 0;
 
+$(document).on('ajaxStart', function() {
+  $('#spinner').animate({opacity: 1}, 400).animate({opacity: 0}, 400);
+});
+
 $(document).ready(function() {
   $('nav button').removeClass('disabled');
 });
@@ -14,33 +18,30 @@ $('nav button').on('click', function() {
 $('form').on('submit', function(event) {
   var boardSize = $('input[name="n"]').val(),
     queryString = '?n=' + boardSize;
-  //location.assign('/n_queens' + queryString); // TODO can I assign location without actually sending a GET request and thereby defeatin ght entire purpose of this ajax shit?
   event.preventDefault();
   $.ajax('/n_queens_board_only' + queryString).done(function(response) {
-    // not replacing whole container as that would break nav buttons
     $('#board').replaceWith($($.parseHTML(response)).find('#board'));
     $('#solutions-info').replaceWith($($.parseHTML(response)).find('#solutions-info'));
+    $('#solutions-info').hide();
     $.ajax('/n_queens_solutions_only' + queryString).done(function(response) {
-      console.log('hi');
-      pollBackgroundTask(response['Location'], response['task_id'], 100);
+      pollBackgroundTask(response['Location'], response['task_id']);
     });
   });
 });
 
-function pollBackgroundTask(responseUrl, taskId, timeOut) {
-  console.log('polling at ' + Date.now());
+function pollBackgroundTask(responseUrl, taskId) {
   $.getJSON(responseUrl, {task_id: taskId}, function(data) {
     if ('result' in data && data['result']['status'] != 'PENDING') {
-      console.log('REQUEST COMPLETED');
       solutions = data['result']; // global
       $('#solution_count').text(solutions.length);
+      $('#solutions-info').delay(400).show(1); // arg to show makes it into an animation, which lets delay affect it, which prevents this from showing before spinner has faded
       if(solutions.length > 0) {
         goToNewSolution(0)
       }
     } else {
       setTimeout(function() {
         pollBackgroundTask(responseUrl, taskId);
-      }, timeOut * 1.5);
+      }, 1000);
     }
   });
 }
