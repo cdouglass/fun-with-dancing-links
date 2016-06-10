@@ -5,9 +5,14 @@ from celery import Celery
 import lib.n_queens
 
 app = flask.Flask(__name__)
-app.config['CELERY_BROKER_URL'] = 'amqp://guest@localhost//'
+# changed from .get("thingy") to ["thingy"] at same time as CLOUDAMQP -> REDIS_URL
+app.config['CELERY_BROKER_URL'] = os.environ.get("CLOUDAMQP_URL")
+app.config['CELERY_RESULT_BACKEND'] = os.environ.get("CLOUDAMQP_URL")
+app.config['CELERY_IGNORE_RESULT'] = False
+if os.path.exists('config.py'):
+  app.config.from_pyfile('config.py')
 
-celery = Celery(app.name, backend="rpc://", broker=app.config['CELERY_BROKER_URL'])
+celery = Celery(app.name, backend=['CELERY_RESULT_BACKEND'], broker=app.config['CELERY_BROKER_URL'], BROKER_POOL_LIMIT=3)
 celery.conf.update(app.config)
 
 @celery.task
