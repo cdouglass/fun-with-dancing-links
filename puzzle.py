@@ -20,8 +20,8 @@ def solve_n_queens_in_background(n):
   return lib.n_queens.n_queens(n)
 
 @app.route('/')
-def hello():
-  return flask.redirect('/n_queens')
+def index():
+  return flask.render_template('index.html')
 
 @app.route('/n_queens')
 def n_queens_default():
