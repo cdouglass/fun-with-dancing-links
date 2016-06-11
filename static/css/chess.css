@@ -1,29 +1,11 @@
+#board-container {
+  text-align: center;
+}
+
 .grid {
   border: 1px solid black;
   display: inline-block;
   margin: 0 auto;
-}
-
-.row {
-  height: 30px;
-  background-color: whitesmoke;
-  overflow: hidden;
-  padding: 0;
-  margin: auto;
-}
-
-.row:nth-child(even) .square:nth-child(even) {
-  background-color: gray;
-}
-
-.row:nth-child(odd) .square:nth-child(odd) {
-  background-color: gray;
-}
-
-.square {
-  float: left;
-  height: 100%;
-  width: 30px;
 }
 
 .row {

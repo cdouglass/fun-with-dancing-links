@@ -2,20 +2,24 @@
   box-sizing: border-box;
 }
 
-body {
-  text-align: center;
-}
-
 h1 {
   font-size: 1.5em;
 }
 
-h1, h2 {
+h2 {
+  font-size: 1.25em;
+}
+
+h1, h2, h3 {
   margin: 20px;
   font-weight: bold;
 }
 
-#container {
+form, p {
+  margin: 1em;
+}
+
+nav, form {
   text-align: center;
 }
 
@@ -23,10 +27,6 @@ h1, h2 {
   opacity: 0;
   margin: 0;
   font-size: 2em;
-}
-
-form, p {
-  margin: 1em;
 }
 
 .disabled, .disabled:hover {

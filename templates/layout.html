@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="../static/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <link rel="stylesheet" type="text/css" href={% block stylesheet %}{% endblock %}>
+    <title>{% block title %}{% endblock %}</title>
+  </head>
+  <body>
+    <div id="content">{% block content %}{% endblock %}</div>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+     {% block scripts %}{% endblock %}
+  </body>
+</html>
