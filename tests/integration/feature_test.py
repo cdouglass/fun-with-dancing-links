@@ -16,10 +16,9 @@ class NQueensIntegrationTests(unittest.TestCase):
     puzzle.app.config['TESTING'] = True
     self.app = puzzle.app.test_client()
 
-  def testRootRedirectsToNQueens(self):
+  def testRootLoads(self):
     response = self.app.get('/', follow_redirects = False)
-    self.assertEqual(302, response.status_code)
-    self.assertIn('/n_queens', response.location)
+    self.assertEqual(200, response.status_code)
 
   def testNQueensLoads(self):
     response = self.app.get('/n_queens')

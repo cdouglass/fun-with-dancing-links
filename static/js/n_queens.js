@@ -5,7 +5,7 @@ $(window).bind('popstate', function(event) {
   var url = location.href,
     queryString = '?' + url.split('?')[1];
   $.ajax('/n_queens_board_only' + queryString).done(function(response) {
-    $('#container').replaceWith($($.parseHTML(response)).filter('#container'));
+    $('#board-container').html(response);
     $('#solutions-info').css('opacity', 0);
     $.ajax('/n_queens_solutions_only' + queryString).done(function(response) {
       pollBackgroundTask(response['Location'], response['task_id']);
@@ -18,7 +18,7 @@ $(document).on('ajaxStart', function() {
 });
 
 $(document).ready(function() {
-  $('nav button').removeClass('disabled');
+  $('nav button').prop('disabled', false);
 });
 
 $('nav button').on('click', function() {
@@ -30,11 +30,13 @@ $('nav button').on('click', function() {
 $('form').on('submit', function(event) {
   var boardSize = $('input[name="n"]').val(),
     queryString = '?n=' + boardSize;
+  console.log("submitted form with contents " + boardSize);
   solutions = [];
   event.preventDefault();
   history.pushState({}, '', '/n_queens' + queryString);
   $.ajax('/n_queens_board_only' + queryString).done(function(response) {
-    $('#container').replaceWith($($.parseHTML(response)).filter('#container'));
+    $('#board-container').html(response);
+    console.log("done");
     $('#solutions-info').css('opacity', 0);
     $.ajax('/n_queens_solutions_only' + queryString).done(function(response) {
       pollBackgroundTask(response['Location'], response['task_id']);
@@ -48,7 +50,7 @@ function pollBackgroundTask(responseUrl, taskId) {
       solutions = data['result']; // global
       $('#solution_count').text(solutions.length);
       $('#solutions-info').delay(600).animate({opacity: 1}); // arg to show makes it into an animation, which lets delay affect it, which prevents this from showing before spinner has faded
-      $('nav button').removeClass('disabled');
+      $('nav button').prop('disabled', false);
       if(solutions.length > 0) {
         goToNewSolution(0)
       }

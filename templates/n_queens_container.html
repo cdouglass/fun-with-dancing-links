@@ -1,5 +1,4 @@
-<div id="board-container">
-  <h1>N Queens Puzzle</h1>
+<div>
   <div id="board" class="grid">
     {% set solution = solutions[0] %}
     {% set default_matrix = [[0] * n] * n %}
@@ -8,7 +7,8 @@
       <div class='row'>
       {% set row_num = loop.index - 1 %}
       {% for v in row %}
-        <div class="square" id="{{ loop.index - 1 }}-{{row_num}}">{{ '♕' if v else ' ' }}</div>
+        {% set color = 'dark' if (loop.index % 2 == row_num % 2) else 'light' %}
+        <div id="{{ loop.index - 1 }}-{{row_num}}" class="square {{color}}">{{ '♕' if v else ' ' }}</div>
       {% endfor %}
       </div>
     {% endfor %}

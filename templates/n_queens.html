@@ -3,15 +3,18 @@
 {% block title %}N Queens Puzzle{% endblock %}
 
 {% block content %}
-  {% include 'n_queens_container.html' %}
-  <div id="spinner">...</div>
+  <h1>N Queens Puzzle</h1>
+  <div id="board-container">
+    {% include 'n_queens_container.html' %}
+  </div>
+  <div id="spinner"><span>...</span></div>
   <nav>
-    <button id="prev" class='disabled'>&lt;&lt;</button>
-    <button id="next" class='disabled'>&gt;&gt;</button>
+    <button id="prev" disabled=true>&lt;&lt;</button>
+    <button id="next" disabled=true>&gt;&gt;</button>
   </nav>
   <form action="/n_queens" method="get">
     <input type="number" name="n" value={{n}}>
-    <input type="submit" name="submit" value="Set board size">
+    <button>Set board size</button>
   </form>
 {% endblock %}
 {% block scripts %}

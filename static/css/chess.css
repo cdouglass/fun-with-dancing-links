@@ -3,28 +3,41 @@
 }
 
 .grid {
-  border: 1px solid black;
-  display: inline-block;
-  margin: 0 auto;
+  padding: 1px 0; /* prevents vertical scrollbar */
+  overflow-x: auto;
+  margin-bottom: 10px;
 }
 
 .row {
   height: 30px;
-  background-color: gray;
+  white-space: nowrap;
+  overflow: visible;
 }
 
-.row:nth-child(even) .square:nth-child(even) {
-  background-color: whitesmoke;
-}
-
-.row:nth-child(odd) .square:nth-child(odd) {
-  background-color: whitesmoke;
+.row:last-child .square {
+  border-bottom: 1px solid black;
 }
 
 .square {
-  float: left;
+  vertical-align: top;
+  margin-left: -6px;
+  display: inline-block;
   height: 100%;
   width: 30px;
-  border: 1px solid black;
+  border-right: 1px solid black;
+  border-top: 1px solid black;
   font-size: 1.75em;
+}
+
+.square:first-child {
+  margin: 0;
+  border-left: 1px solid black;
+}
+
+.square.light {
+  background-color: whitesmoke;
+}
+
+.square.dark {
+  background-color: gray;
 }

@@ -2,6 +2,28 @@
   box-sizing: border-box;
 }
 
+body {
+  background-color: hsla(240, 90%, 80%, 1);
+  padding: 30px 100px;
+}
+
+header {
+  background-color: white;
+  padding: 10px;
+  border-radius: 15px;
+  margin-bottom: 10px;
+}
+
+header a {
+  margin: 0 10px 0 10px;
+}
+
+#content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 15px;
+}
+
 h1 {
   font-size: 1.5em;
 }
@@ -11,26 +33,44 @@ h2 {
 }
 
 h1, h2, h3 {
-  margin: 20px;
+  margin: 20px 0;
   font-weight: bold;
+  text-align: center;
 }
 
-form, p {
-  margin: 1em;
+form, p, section nav {
+  margin-bottom: 10px;
+}
+
+input[type="number"] {
+  border-radius: 5px;
+  margin-bottom: 10px;
+  max-width: 100%;
 }
 
 nav, form {
   text-align: center;
 }
 
-#spinner {
-  opacity: 0;
-  margin: 0;
-  font-size: 2em;
+a.internal {
+  text-decoration: none;
+  color: inherit;
+  text-align: center;
+  display: inline-block;
 }
 
-.disabled, .disabled:hover {
-  color: #BBB;
-  background-color: lightgray;
-  border-width: 1px;
+a div, button {
+  background-color: hsla(240, 90%, 70%, 1);
+  border: none;
+  border-radius: 5px;
+  padding: 5px;
+  text-align: center;
+}
+
+#spinner {
+  opacity: 0;
+  font-size: 2em;
+  text-align: center;
+  line-height: 0;
+  margin: 0 0 20px 0;
 }
