@@ -6,11 +6,26 @@ def n_queens(n):
   position_lists = solutions if len(solutions) > 0 else []
   return [position_list_to_board(pl, n) for pl in position_lists]
 
+def organ_pipe_ordering(n):
+  low = 0
+  high = n - 1
+  order = []
+  while low <= high:
+    order.append(low)
+    order.append(high)
+    low += 1
+    high -= 1
+  order.reverse()
+  return order
+
 def generate_all_column_headers(n):
-  return  [col_id("col", m) for m in range(0, n)] + \
-          [col_id("row", m) for m in range(0, n)] + \
-          [col_id("f_diag", m) for m in range(1 - n, n)] + \
-          [col_id("r_diag", m) for m in range(1, 2 * n - 2)]
+  diagonals = [col_id("f_diag", m) for m in range(1 - n, n)] + \
+              [col_id("r_diag", m) for m in range(1, 2 * n - 2)]
+  rows_and_columns = []
+  for m in organ_pipe_ordering(n):
+    rows_and_columns.append(col_id("col", m))
+    rows_and_columns.append(col_id("row", m))
+  return rows_and_columns + diagonals
 
 def generate_all_positions_as_rows(n):
   return flatten([[[x, y] for x in range(0, n)] for y in range(0, n)])

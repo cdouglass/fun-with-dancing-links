@@ -108,12 +108,11 @@ def find_exact_cover_for_rows(names, rows):
 
 # [Column] -> Root
 def make_matrix_from_columns(columns):
-  cols = sorted(columns, key = lambda c: c.name) # sorted creates new sorted array; sort modifies in place
   root = Root()
   current = root
-  for col in cols:
-    current.insert_right(col)
-    current = col
+  for column in columns:
+    current.insert_right(column)
+    current = column
   return root
 
 # [str], [[int]] -> Root # old, want below instead

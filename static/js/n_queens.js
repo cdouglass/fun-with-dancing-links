@@ -51,13 +51,14 @@ function pollBackgroundTask(responseUrl, taskId) {
       $('#solution_count').text(solutions.length);
       $('#solutions-info').delay(600).animate({opacity: 1}); // arg to show makes it into an animation, which lets delay affect it, which prevents this from showing before spinner has faded
       $('nav button').prop('disabled', false);
+      $('#spinner').finish();
       if(solutions.length > 0) {
         goToNewSolution(0)
       }
     } else {
       setTimeout(function() {
         pollBackgroundTask(responseUrl, taskId);
-      }, 1000);
+      }, 10);
     }
   });
 }

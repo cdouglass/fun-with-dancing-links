@@ -48,7 +48,7 @@ class TestMatchers(unittest.TestCase):
 
   def test_generate_column_headers_and_matchers(self):
     headers = generate_all_column_headers(2)
-    expected_headers = ["col:0", "col:1", "row:0", "row:1", "f_diag:-1", "f_diag:0", "f_diag:1", "r_diag:1"]
+    expected_headers = ["col:1", "row:1", "col:0", "row:0", "f_diag:-1", "f_diag:0", "f_diag:1", "r_diag:1"]
     self.assertEqual(expected_headers, headers)
 
   def test_header_to_matcher(self):

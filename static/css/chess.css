@@ -24,14 +24,17 @@
   display: inline-block;
   height: 100%;
   width: 30px;
-  border-right: 1px solid black;
+  border-left: 1px solid black;
   border-top: 1px solid black;
   font-size: 1.75em;
 }
 
 .square:first-child {
   margin: 0;
-  border-left: 1px solid black;
+}
+
+.square:last-child {
+  border-right: 1px solid black;
 }
 
 .square.light {
