@@ -18,7 +18,7 @@
 
 <p>This is a generalization of the <a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle">eight queens problem</a>, a well-known chess puzzle where the goal is to place eight queens on an 8x8 chess board so that none of them threaten one another.</p>
 
-<p>The N queens problem is not strictly an exact cover problem, since each diagonal may contain either one or zero queens. Currently I'm fudging this by adding dummy piece placements that each cover one diagonal and no ranks or files, but there's a faster way to handle this that I'll implement at some point.</p>
+<p>The N queens problem is not strictly an exact cover problem, since each diagonal may contain either one or zero queens. This can be handled with a slight change to the data structure involved so that the program will not waste time trying to cover diagonals.</p>
 
 <a class="internal" href="/n_queens"><div>Interactive N queens solver</div></a>
 

@@ -217,6 +217,7 @@ class TestAlgorithm(unittest.TestCase):
     self.assertEqual([row_list], standardize_solution_set(solutions)) 
 
   # isomorphic to n queens for n = 2 if we ignore the minor diagonal
+  # TODO secondary columns
   def test_2_queens(self):
     names = ["r0", "r1", "c0", "c1", "md", "d-", "d+"]
     placements = [["r0", "c0", "md"],

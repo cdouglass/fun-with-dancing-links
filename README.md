@@ -10,9 +10,9 @@ So far only the N queens portion of the project is complete.
 
 These are problems where the goal is to find a solution satisfying each one of a set of conditions exactly once. Sudoku is an example that's easy to visualize: each row, column, and sub-grid must contain exactly one of each digit from 1 through 9. Solving problems of this form, as far as we know, has a time requirement that's exponential in the size of the input.
 
-The N queens problem is not strictly an exact cover problem, since each diagonal may contain either one or zero queens. Currently I'm fudging this by adding dummy piece placements that each cover one diagonal and no ranks or files, but there's a faster way to handle this that I'll implement at some point.
-
 The obvious way to find all solutions to such a problem is performing a depth-first search using backtracking; the dancing links technique uses a nifty data structure that makes backtracking more efficient. A paper describing its use, with several examples, is available at [arxiv.org](http://arxiv.org/abs/cs/0011047).
+
+The N queens problem is not strictly an exact cover problem, since each diagonal may contain either one or zero queens. This can be handled with a slight change to the data structure involved so that the program will not waste time trying to cover diagonals.
 
 ##Setup (for Debian-based Linuxes; not tested elsewhere)
 

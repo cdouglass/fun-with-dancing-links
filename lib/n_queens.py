@@ -18,26 +18,29 @@ def organ_pipe_ordering(n):
   order.reverse()
   return order
 
-def generate_all_column_headers(n):
-  diagonals = [col_id("f_diag", m) for m in range(1 - n, n)] + \
-              [col_id("r_diag", m) for m in range(1, 2 * n - 2)]
+def primary_column_headers(n):
   rows_and_columns = []
   for m in organ_pipe_ordering(n):
     rows_and_columns.append(col_id("col", m))
     rows_and_columns.append(col_id("row", m))
-  return rows_and_columns + diagonals
+  return rows_and_columns
 
-def generate_all_positions_as_rows(n):
+def secondary_column_headers(n):
+  diagonals = [col_id("f_diag", m) for m in range(1 - n, n)] + \
+              [col_id("r_diag", m) for m in range(1, 2 * n - 2)]
+  return diagonals
+
+def all_positions_as_rows(n):
   return flatten([[[x, y] for x in range(0, n)] for y in range(0, n)])
 
 # int -> [[[str]]] ie array of solutions, each of which is represented as an array of rows
 def solve_n_queens(n):
-  col_headers = generate_all_column_headers(n)
-  col_matchers = [header_to_matcher(header) for header in col_headers]
-  positions = generate_all_positions_as_rows(n)
+  primary_headers = primary_column_headers(n)
+  secondary_headers = secondary_column_headers(n)
+  col_matchers = [header_to_matcher(header) for header in primary_headers + secondary_headers]
+  positions = all_positions_as_rows(n)
   rows = [[matcher(*pos) for matcher in col_matchers if matcher(*pos)] for pos in positions]
-  diags = [[col_id("f_diag", m)] for m in range(1 - n, n)] + [[col_id("r_diag", m)] for m in range(1, 2 * n - 2)]
-  solution_row_sets = lib.exact_cover.find_exact_cover_for_rows(col_headers, rows + diags)
+  solution_row_sets = lib.exact_cover.find_exact_cover_for_rows(rows, primary_headers, secondary_headers)
   return [[row_to_position(row) for row in row_set if row_to_position(row)] for row_set in solution_row_sets]
 
 def header_to_matcher(header):
