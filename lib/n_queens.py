@@ -26,9 +26,8 @@ def primary_column_headers(n):
   return rows_and_columns
 
 def secondary_column_headers(n):
-  diagonals = [col_id("f_diag", m) for m in range(1 - n, n)] + \
-              [col_id("r_diag", m) for m in range(1, 2 * n - 2)]
-  return diagonals
+  return [col_id("f_diag", m) for m in range(1 - n, n)] + \
+         [col_id("r_diag", m) for m in range(1, 2 * n - 2)]
 
 def all_positions_as_rows(n):
   return flatten([[[x, y] for x in range(0, n)] for y in range(0, n)])

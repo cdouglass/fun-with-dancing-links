@@ -59,6 +59,10 @@ class Column(Node):
   def remove_horizontally(self):
     self.left.right = self.right
     self.right.left = self.left
+  def make_secondary(self):
+    self.remove_horizontally()
+    self.left = self
+    self.right = self
   def restore_horizontally(self):
     self.left.insert_right(self)
   # Column -> Root
@@ -98,7 +102,7 @@ def find_exact_cover(matrix, full_solutions = [], partial_solution = []):
 
 # convenience
 # [str], [[str]] -> [[[str]]]
-def find_exact_cover_for_rows(rows, primary_headers, secondary_headers):
+def find_exact_cover_for_rows(rows, primary_headers, secondary_headers=[]):
   solutions = []
   matrix = make_matrix_from_rows(rows, primary_headers, secondary_headers)
   find_exact_cover(matrix, solutions)
@@ -131,7 +135,7 @@ def make_matrix_from_rows(rows, primary_headers, secondary_headers=[]):
         current_node.insert_right(node)
         current_node = node
   for column in secondary_columns:
-    column.remove_horizontally() # so find_exact_cover will not waste time covering columns that it's ok to leave uncovered (slight generalization of exact cover problem)
+    column.make_secondary() # so find_exact_cover will not waste time covering columns that it's ok to leave uncovered (slight generalization of exact cover problem)
   return matrix
 
 # column names constitute first row

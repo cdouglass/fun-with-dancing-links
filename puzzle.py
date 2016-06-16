@@ -26,7 +26,7 @@ def index():
 @app.route('/n_queens')
 def n_queens_default():
   args = request.args
-  n = int(args['n']) if args else 4
+  n = int(args['n']) if args else 8
   solutions = lib.n_queens.n_queens(n)
   return flask.render_template('n_queens.html', solutions = solutions, n = n)
 

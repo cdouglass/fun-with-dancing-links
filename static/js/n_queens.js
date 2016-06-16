@@ -30,13 +30,11 @@ $('nav button').on('click', function() {
 $('form').on('submit', function(event) {
   var boardSize = $('input[name="n"]').val(),
     queryString = '?n=' + boardSize;
-  console.log("submitted form with contents " + boardSize);
   solutions = [];
   event.preventDefault();
   history.pushState({}, '', '/n_queens' + queryString);
   $.ajax('/n_queens_board_only' + queryString).done(function(response) {
     $('#board-container').html(response);
-    console.log("done");
     $('#solutions-info').css('opacity', 0);
     $.ajax('/n_queens_solutions_only' + queryString).done(function(response) {
       pollBackgroundTask(response['Location'], response['task_id']);

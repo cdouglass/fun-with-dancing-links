@@ -110,7 +110,7 @@ class TestMatrixOperations(unittest.TestCase):
     self.names = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
     self.rows = [['a', 'd'], ['a', 'd', 'g'], ['b', 'c', 'f'],
             ['b', 'g'], ['c', 'e', 'f'], ['d', 'e', 'g']]
-    self.matrix = make_matrix_from_rows(self.names, self.rows)
+    self.matrix = make_matrix_from_rows(self.rows, self.names)
     return None
 
   def test_remove_element_horizontally(self):
@@ -151,7 +151,7 @@ class TestMatrixOperations(unittest.TestCase):
 
   def test_make_matrix_from_single_node_rows(self):
     rows = [['a'], ['b'], ['c'], ['d'], ['e'], ['f'], ['g']]
-    matrix = make_matrix_from_rows(self.names, rows)
+    matrix = make_matrix_from_rows(rows, self.names)
     self.assertTrue(is_valid_matrix(matrix))
 
   def test_make_rows_from_matrix(self):
@@ -166,7 +166,7 @@ class TestAlgorithm(unittest.TestCase):
     self.names = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
     self.unique_solution_rows = [['a', 'd'], ['a', 'd', 'g'], ['b', 'c', 'f'],
             ['b', 'g'], ['c', 'e', 'f'], ['d', 'e', 'g']]
-    self.unique_solution_matrix = make_matrix_from_rows(self.names, self.unique_solution_rows)
+    self.unique_solution_matrix = make_matrix_from_rows(self.unique_solution_rows, self.names)
     self.unique_solution = [[['a', 'd'], ['b', 'g'], ['c', 'e', 'f']]]
     self.multiple_solutions_rows = [['c', 'd', 'e'], ['a', 'f'], ['b', 'g'],
                                     ['a', 'b'], ['f', 'g'], ['b', 'c', 'd', 'e', 'g']]
@@ -177,7 +177,7 @@ class TestAlgorithm(unittest.TestCase):
   def test_algorithm_on_unsolvable_matrix(self):
     rows = [['a', 'd', 'f'], ['a', 'd', 'g'], ['b', 'c', 'f'],
             ['b', 'g'], ['c', 'e', 'f'], ['d', 'e', 'g']]
-    matrix = make_matrix_from_rows(self.names, rows)
+    matrix = make_matrix_from_rows(rows, self.names)
     solutions = []
     find_exact_cover(matrix, solutions, [])
     self.assertEqual([], solutions)
@@ -194,7 +194,7 @@ class TestAlgorithm(unittest.TestCase):
     self.assertEqual(rows, self.unique_solution_rows)
 
   def test_finds_multiple_solutions_on_matrix(self):
-    multiple_solutions_matrix = make_matrix_from_rows(self.names, self.multiple_solutions_rows)
+    multiple_solutions_matrix = make_matrix_from_rows(self.multiple_solutions_rows, self.names)
     solutions = []
     find_exact_cover(multiple_solutions_matrix, solutions, [])
     solutions_as_row_lists = [[row.get_column_names_for_row() for row in sol] for sol in solutions]
@@ -202,18 +202,18 @@ class TestAlgorithm(unittest.TestCase):
     self.assertEqual(3, len(solutions))
 
   def test_finds_solution_for_simple_row_set(self):
-    solutions = find_exact_cover_for_rows(self.names, self.unique_solution_rows)
+    solutions = find_exact_cover_for_rows(self.unique_solution_rows, self.names)
     self.assertEqual(self.unique_solution, standardize_solution_set(solutions))
     self.assertEqual(1, len(solutions))
 
   def test_finds_multiple_solutions_for_row_set(self):
-    solutions = find_exact_cover_for_rows(self.names, self.multiple_solutions_rows)
+    solutions = find_exact_cover_for_rows(self.multiple_solutions_rows, self.names)
     self.assertEqual(self.expected_multiple_solutions, standardize_solution_set(solutions))
     self.assertEqual(3, len(solutions))
 
   def test_finds_solution_for_rows_with_one_node_each(self):
     row_list = [[name] for name in self.names]
-    solutions = find_exact_cover_for_rows(self.names, row_list)
+    solutions = find_exact_cover_for_rows(row_list, self.names)
     self.assertEqual([row_list], standardize_solution_set(solutions)) 
 
   # isomorphic to n queens for n = 2 if we ignore the minor diagonal
@@ -227,5 +227,5 @@ class TestAlgorithm(unittest.TestCase):
                   ["md"],
                   ["d+"],
                   ["d-"]] # diagonals should be covered AT MOST once - these can bring it up to 1
-    sols = find_exact_cover_for_rows(names, placements)
+    sols = find_exact_cover_for_rows(placements, names)
     self.assertEqual(1, len(sols))

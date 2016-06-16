@@ -29,8 +29,8 @@ class NQueensIntegrationTests(unittest.TestCase):
     body = BeautifulSoup(response.data, 'html.parser') # BS assumes byte strings are UTF-8
     fields = get_contents_of_ids(body, ["index", "solution_count", "n"])
     self.assertEqual('1', fields["index"])
-    self.assertEqual('2', fields["solution_count"])
-    self.assertEqual('4', fields["n"])
+    self.assertEqual('92', fields["solution_count"])
+    self.assertEqual('8', fields["n"])
 
   def testNQueensWithQueryStringSucceeds(self):
     response = self.app.get('/n_queens?n=6')

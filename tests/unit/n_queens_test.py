@@ -46,9 +46,14 @@ class TestMatchers(unittest.TestCase):
   def test_col_id(self):
     self.assertEqual("row:3", col_id("row", 3))
 
-  def test_generate_column_headers_and_matchers(self):
-    headers = generate_all_column_headers(2)
-    expected_headers = ["col:1", "row:1", "col:0", "row:0", "f_diag:-1", "f_diag:0", "f_diag:1", "r_diag:1"]
+  def test_generate_primary_headers(self):
+    headers = primary_column_headers(2)
+    expected_headers = ["col:1", "row:1", "col:0", "row:0"]
+    self.assertEqual(expected_headers, headers)
+
+  def test_generate_primary_headers(self):
+    headers = secondary_column_headers(2)
+    expected_headers = ["f_diag:-1", "f_diag:0", "f_diag:1", "r_diag:1"]
     self.assertEqual(expected_headers, headers)
 
   def test_header_to_matcher(self):
