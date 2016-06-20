@@ -1,20 +1,29 @@
-// global clueSet
-var board = $("#board");
+/*jslint browser: true, indent:2*/
+/*global $, clueSet*/
+var board = $("#board"),
+  digits = [1, 2, 3, 4, 5, 6, 7, 8, 9],
+  currentSolution,
+  r;
 
-function getCoords(square) {
-  return square.attr('id').split("-");
+function getCoords(cell) {
+  "use strict";
+  return cell.attr('id').split("-");
 }
 
-function getSquare(coords) {
+function getCell(coords) {
+  "use strict";
   var id = coords.join("-");
   return $("#" + id);
 }
 
 function copyMatrix(arr) {
-  var result = [];
-  for (y = 0; y < arr.length; y++) {
-    r = []
-    for (x = 0; x < arr[0].length; x++) {
+  "use strict";
+  var result = [],
+    x,
+    y;
+  for (y = 0; y < arr.length; y += 1) {
+    r = [];
+    for (x = 0; x < arr[0].length; x += 1) {
       r.push(arr[y][x]);
     }
     result.push(r);
@@ -22,31 +31,36 @@ function copyMatrix(arr) {
   return result;
 }
 
-var currentSolution = copyMatrix(clueSet),
-  r;
-
 function isValidDigit(c) {
-  return [1, 2, 3, 4, 5, 6, 7, 8, 9].indexOf(c) != -1;
+  "use strict";
+  return digits.indexOf(c) !== -1;
 }
 
 function isValidUnit(arr) {
-  // TODO
+  "use strict";
+  var digitIndices = {}; // TODO empty arr for each digit, add indices, if any digit has >1 index do something
 }
 
+currentSolution = copyMatrix(clueSet);
+
 function redrawBoard() {
-  var x, y, square;
-  for (x = 0; x < currentSolution.length; x++) {
-    for (y = 0; y < currentSolution.length; y++) {
-      square = getSquare([x, y]);
-      square.text(currentSolution[y][x]);
+  "use strict";
+  var x, y, cell;
+  for (x = 0; x < currentSolution.length; x += 1) {
+    for (y = 0; y < currentSolution.length; y += 1) {
+      cell = getCell([x, y]);
+      cell.text(currentSolution[y][x]);
     }
   }
 }
 
-function getNumber(square) {
-  var [x, y] = getCoords(square);
-  square.on('keypress', function(c) {
-    var value = parseInt(c.key);
+function getNumber(cell) {
+  "use strict";
+  var coords = getCoords(cell),
+    x = coords[0],
+    y = coords[1];
+  cell.on('keypress', function (c) {
+    var value = parseInt(c.key, 10);
     if (isValidDigit(value)) {
       currentSolution[y][x] = value;
       redrawBoard();
@@ -54,21 +68,27 @@ function getNumber(square) {
   });
 }
 
-function clear(square) {
-  var [x, y] = getCoords(square);
+function clear(cell) {
+  "use strict";
+  var coords = getCoords(cell),
+    x = coords[0],
+    y = coords[1];
   currentSolution[y][x] = null;
   redrawBoard();
 }
 
-$('.free').on('focus', function() {
+$('.free').on('focus', function () {
+  "use strict";
   getNumber($(this));
 });
 
-$('.free').on('contextmenu', function() {
+$('.free').on('contextmenu', function () {
+  "use strict";
   clear($(this));
 });
 
-$('#clear').on('click', function() { // also occurs on submitting via enter
+$('#clear').on('click', function () { // also occurs on submitting via enter
+  "use strict";
   currentSolution = copyMatrix(clueSet);
   redrawBoard();
 });
