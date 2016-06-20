@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block stylesheet %}"../static/css/board.css"{% endblock %}
+{% block title %}Sudoku{% endblock %}
+
+{% block content %}
+  <h1>Sudoku</h1>
+  <div id="board-container">
+    <div id="board" class="grid sudoku">
+      {% for row in clue_set %}
+        <div class='row'>
+        {% set row_num = loop.index - 1 %}
+        {% for clue in row %}
+          <div id="{{ loop.index - 1 }}-{{row_num}}" class="square">{{ clue if clue else ' ' }}</div>
+        {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+  <script type="text/javascript" src="../static/js/sudoku.js"></script>
+{% endblock %}

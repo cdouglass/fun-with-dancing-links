@@ -27,6 +27,7 @@
   border-left: 1px solid black;
   border-top: 1px solid black;
   font-size: 1.75em;
+  text-align: center;
 }
 
 .square:first-child {
@@ -43,4 +44,19 @@
 
 .chess .square.dark {
   background-color: gray;
+}
+
+.sudoku .square:nth-child(3n + 1) {
+  border-left-width: 3px;
+}
+.sudoku .square:last-child {
+  border-right-width: 3px;
+}
+
+.sudoku .row:last-child .square {
+  border-bottom-width: 3px;
+}
+
+.sudoku .row:nth-child(3n+1) .square {
+  border-top-width: 3px;
 }

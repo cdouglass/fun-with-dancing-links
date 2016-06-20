@@ -3,6 +3,7 @@ import flask
 from flask import request
 from celery import Celery
 import lib.n_queens
+import lib.sudoku
 
 app = flask.Flask(__name__)
 # changed from .get("thingy") to ["thingy"] at same time as CLOUDAMQP -> REDIS_URL
@@ -22,6 +23,11 @@ def solve_n_queens_in_background(n):
 @app.route('/')
 def index():
   return flask.render_template('index.html')
+
+@app.route('/sudoku')
+def sudoku():
+  clue_set = lib.sudoku.generate_clue_set() # TODO null except where there's a number. 2d array
+  return flask.render_template('sudoku.html', clue_set = clue_set)
 
 @app.route('/n_queens')
 def n_queens_default():
