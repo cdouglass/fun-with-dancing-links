@@ -56,7 +56,7 @@ function pollBackgroundTask(responseUrl, taskId) {
     } else {
       setTimeout(function() {
         pollBackgroundTask(responseUrl, taskId);
-      }, 10);
+      }, 500);
     }
   });
 }
