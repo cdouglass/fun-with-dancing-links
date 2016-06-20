@@ -8,10 +8,10 @@
     {% include 'n_queens_container.html' %}
   </div>
   <div id="spinner"><span>...</span></div>
-  <nav>
+  <div class="controls">
     <button id="prev" disabled=true>&lt;&lt;</button>
     <button id="next" disabled=true>&gt;&gt;</button>
-  </nav>
+  </div>
   <form action="/n_queens" method="get">
     <input type="number" name="n" value={{n}}>
     <button>Set board size</button>

@@ -18,10 +18,10 @@ $(document).on('ajaxStart', function() {
 });
 
 $(document).ready(function() {
-  $('nav button').prop('disabled', false);
+  $('button').prop('disabled', false);
 });
 
-$('nav button').on('click', function() {
+$('button').on('click', function() {
   var delta = (this.id == 'prev') ? -1 : 1,
     nextIndex = index + delta + solutions.length;
   goToNewSolution(nextIndex);
@@ -48,7 +48,7 @@ function pollBackgroundTask(responseUrl, taskId) {
       solutions = data['result']; // global
       $('#solution_count').text(solutions.length);
       $('#solutions-info').delay(600).animate({opacity: 1}); // arg to show makes it into an animation, which lets delay affect it, which prevents this from showing before spinner has faded
-      $('nav button').prop('disabled', false);
+      $('button').prop('disabled', false);
       $('#spinner').finish();
       if(solutions.length > 0) {
         goToNewSolution(0)

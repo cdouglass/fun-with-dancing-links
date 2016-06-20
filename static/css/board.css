@@ -30,6 +30,11 @@
   text-align: center;
 }
 
+.square:focus {
+  box-shadow: inset 0 0 0 2px gray;
+  outline: none;
+}
+
 .square:first-child {
   margin: 0;
 }

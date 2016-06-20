@@ -26,19 +26,19 @@ var currentSolution = copyMatrix(clueSet),
   r;
 
 function isValidDigit(c) {
-  return c in [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  return [1, 2, 3, 4, 5, 6, 7, 8, 9].indexOf(c) != -1;
 }
 
 function isValidUnit(arr) {
   // TODO
 }
 
-function redrawBoard(values) {
+function redrawBoard() {
   var x, y, square;
-  for (x = 0; x < values.length; x++) {
-    for (y = 0; y < values.length; y++) {
+  for (x = 0; x < currentSolution.length; x++) {
+    for (y = 0; y < currentSolution.length; y++) {
       square = getSquare([x, y]);
-      square.text(values[y][x]);
+      square.text(currentSolution[y][x]);
     }
   }
 }
@@ -46,14 +46,29 @@ function redrawBoard(values) {
 function getNumber(square) {
   var [x, y] = getCoords(square);
   square.on('keypress', function(c) {
-    var value = c.key;
+    var value = parseInt(c.key);
     if (isValidDigit(value)) {
       currentSolution[y][x] = value;
-      redrawBoard(currentSolution);
+      redrawBoard();
     }
   });
 }
 
+function clear(square) {
+  var [x, y] = getCoords(square);
+  currentSolution[y][x] = null;
+  redrawBoard();
+}
+
 $('.free').on('focus', function() {
   getNumber($(this));
+});
+
+$('.free').on('contextmenu', function() {
+  clear($(this));
+});
+
+$('#clear').on('click', function() { // also occurs on submitting via enter
+  currentSolution = copyMatrix(clueSet);
+  redrawBoard();
 });
