@@ -46,6 +46,10 @@
   background-color: gray;
 }
 
+.given {
+  font-weight: bold;
+}
+
 .sudoku .square:nth-child(3n + 1) {
   border-left-width: 3px;
 }

@@ -10,7 +10,11 @@
         <div class='row'>
         {% set row_num = loop.index - 1 %}
         {% for clue in row %}
-          <div id="{{ loop.index - 1 }}-{{row_num}}" class="square">{{ clue if clue else ' ' }}</div>
+          {% if clue %}
+            <div id="{{ loop.index - 1 }}-{{row_num}}" class="square given">{{clue}}</div>
+          {% else %}
+            <div id="{{ loop.index - 1 }}-{{row_num}}" class="square free" tabindex="0"></div>
+          {% endif %}
         {% endfor %}
         </div>
       {% endfor %}
@@ -18,5 +22,6 @@
   </div>
 {% endblock %}
 {% block scripts %}
+  <script>var None = null, clueSet = {{clue_set}};</script>
   <script type="text/javascript" src="../static/js/sudoku.js"></script>
 {% endblock %}
