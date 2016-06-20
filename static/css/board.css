@@ -37,10 +37,10 @@
   border-right: 1px solid black;
 }
 
-.square.light {
+.chess .square.light {
   background-color: whitesmoke;
 }
 
-.square.dark {
+.chess .square.dark {
   background-color: gray;
 }

@@ -1,5 +1,5 @@
 <div>
-  <div id="board" class="grid">
+  <div id="board" class="grid chess">
     {% set solution = solutions[0] %}
     {% set default_matrix = [[0] * n] * n %}
     {% set matrix = (default_matrix if (solutions|length == 0) else solution) %}
