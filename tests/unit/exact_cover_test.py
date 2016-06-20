@@ -138,6 +138,17 @@ class TestMatrixOperations(unittest.TestCase):
     rows = sorted(make_rows_from_matrix(self.matrix))
     self.assertEqual(rows, self.rows)
 
+  def test_secondary_column(self):
+    col = self.matrix.left
+    last_col = col.left
+    col.make_secondary()
+    self.assertEqual(col, col.left)
+    self.assertEqual(col, col.right)
+    self.assertEqual(last_col, self.matrix.left)
+    self.assertEqual(self.matrix, last_col.right)
+    rows = sorted(make_rows_from_matrix(self.matrix))
+    self.assertEqual(rows, self.rows) # making a column secondary doesn't interfere with extracting rows from matrix
+
   def test_make_matrix_from_columns(self):
     columns = [Column(i) for i in self.names]
     matrix = make_matrix_from_columns(columns)
