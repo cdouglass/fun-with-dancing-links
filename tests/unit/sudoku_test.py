@@ -51,6 +51,13 @@ class TestUtilities(unittest.TestCase):
   def test_allowed_values_on_empty_board(self):
     self.assertEqual(set(range(1, 10)), allowed_values_at_coords(1, 4, self.empty_board))
 
+  def test_all_column_headers(self):
+    self.assertEqual(243, len(column_headers()))
+
+  def test_make_matrix_row_for_move(self):
+    row = make_matrix_row_for_move(7, 3, 9)
+    self.assertEqual(["9-row-3", "9-col-7", "9-subgrid-5"], row)
+
   def test_allowed_values_on_partially_filled_board(self):
     partial_board = self.empty_board
     partial_board[0][5] = 1

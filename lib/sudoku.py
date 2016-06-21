@@ -48,6 +48,38 @@ def random_clue_set():
       board = empty_board()
   return board
 
+def make_header(digit, kind, index):
+  return "-".join([str(digit), kind, str(index)])
+
+def column_headers():
+  headers = []
+  for digit in range(1, 10):
+    for index in range(0, 9):
+      for kind in ["row", "col", "subgrid"]:
+        headers.append(make_header(digit, kind, index))
+  return headers
+
+def make_matrix_row_for_move(x, y, digit):
+  subgrid_index = 3 * (y // 3) + x // 3# across then down 
+  return [make_header(digit, kind, index) for kind, index in [["row", y], ["col", x], ["subgrid", subgrid_index]]]
+
+def convert_to_matrix(board):
+  # TODO
+    # 1. make rows for all possible plays in all currently empty spaces
+    # 2. make a matrix from these
+    # 3. make row for each ALREADY SET square
+    # 4. add all these rows to the matrix
+    # 5. cover all columns that these rows cover (make sure to include current node!)
+  pass
+  # columns: for each digit 1-9, one of each board row, one of each board column, and one of each board subgrid. this gives 243 columns. can't leave out those that are already covered
+  # rows: one for each digit 1-9 for each of the 81 squares (so 729) BUT once we've made the matrix we can cover 25 of them straight away plus all columns they covere and all rows that would cover any of the same columns (as on line 97 of exact_cover.py) which will make things a LOT smaller
+
+# TODO later convert solution row set to board format so as to pass it on to view
+def validate_clue_set(board):
+  matrix = convert_to_matrix(board)
+  solutions = lib.exact_cover.find_exact_cover(matrix)
+  return len(solutions == 1)
+
 def generate_clue_set():
   clues = [[5,    3,    None, None, 7,    None, None, None, None],
            [6,    None, None, 1,    9,    5,    None, None, None],
