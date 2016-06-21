@@ -136,7 +136,7 @@ class TestMatrixOperations(unittest.TestCase):
     col.cover_column()
     col.uncover_column()
     rows = sorted(make_rows_from_matrix(self.matrix))
-    self.assertEqual(rows, self.rows)
+    self.assertEqual(self.rows, rows)
 
   def test_secondary_column(self):
     col = self.matrix.left
@@ -147,7 +147,23 @@ class TestMatrixOperations(unittest.TestCase):
     self.assertEqual(last_col, self.matrix.left)
     self.assertEqual(self.matrix, last_col.right)
     rows = sorted(make_rows_from_matrix(self.matrix))
-    self.assertEqual(rows, self.rows) # making a column secondary doesn't interfere with extracting rows from matrix
+    self.assertEqual(self.rows, rows) # making a column secondary doesn't interfere with extracting rows from matrix
+
+  def test_cover_and_uncover_all_other_columns_in_row(self):
+    row = ['a', 'b', 'g']
+    row_node = self.matrix.add_row(row)
+    row_node.cover_all_other_columns_in_row()
+    expected_rows = [['a', 'd'], ['c', 'e', 'f']]
+    self.assertEqual(expected_rows, sorted(make_rows_from_matrix(self.matrix)))
+    row_node.uncover_all_other_columns_in_row()
+    self.assertEqual(sorted(self.rows + [row]), sorted(make_rows_from_matrix(self.matrix)))
+
+  def test_add_row_to_matrix(self):
+    row = ['d', 'f']
+    expected_rows = self.rows + [row]
+    self.matrix.add_row(row)
+    rows = sorted(make_rows_from_matrix(self.matrix))
+    self.assertEqual(expected_rows, rows)
 
   def test_make_matrix_from_columns(self):
     columns = [Column(i) for i in self.names]

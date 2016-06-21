@@ -1,4 +1,5 @@
 class InvalidLooping(Exception):
+  
   def __init__(self):
     Exception.__init__(self)
 
@@ -24,6 +25,16 @@ class Root:
       visited_nodes.append(current_node)
       current_node = move(current_node)
     return results
+  # Root, [header] -> Node
+  def add_row(self, row):
+    nodes = self.loop_through_circular_list(lambda x: x.right, lambda x: x.add_node_to_column_if_element_present(row))
+    nodes = [n for n in nodes if n is not None]
+    if len(nodes) > 0:
+      current_node = nodes[0]
+      for node in nodes:
+        current_node.insert_right(node)
+        current_node = node
+    return nodes[0]
 
 class Node(Root):
   def __init__(self, column):
@@ -49,6 +60,10 @@ class Node(Root):
     self.loop_through_circular_list(lambda x: x.right, lambda x: x.restore_vertically())
   def get_column_names_for_row(self):
     return [self.column.name] + self.loop_through_circular_list(lambda x: x.right, lambda x: x.column.name)
+  def cover_all_other_columns_in_row(self):
+    self.loop_through_circular_list(lambda x: x.right, lambda x: x.column.cover_column())
+  def uncover_all_other_columns_in_row(self):
+    self.loop_through_circular_list(lambda x: x.left, lambda x: x.column.uncover_column())
 
 class Column(Node):
   def __init__(self, name):
@@ -94,9 +109,9 @@ def find_exact_cover(matrix, full_solutions = [], partial_solution = []):
     rows_in_column = column.loop_through_circular_list(lambda x: x.down, lambda x: x) # [Node]
     for row in rows_in_column:
       partial_solution.append(row)
-      row.loop_through_circular_list(lambda x: x.right, lambda x: x.column.cover_column())
+      row.cover_all_other_columns_in_row()
       find_exact_cover(matrix, full_solutions, partial_solution)
-      row.loop_through_circular_list(lambda x: x.left, lambda x: x.column.uncover_column())
+      row.uncover_all_other_columns_in_row()
       partial_solution.pop()
     column.uncover_column() # restore matrix to original state
 
@@ -108,7 +123,7 @@ def find_exact_cover_for_rows(rows, primary_headers, secondary_headers=[]):
   find_exact_cover(matrix, solutions)
   return [[node.get_column_names_for_row() for node in sol] for sol in solutions]
 
-# Moving info in and out of matrices
+# Matrix manipulation
 
 # Only sets up structure of matrix - if columns are populated already, nodes will not get connected correctly
 # [Column] -> Root
@@ -127,13 +142,7 @@ def make_matrix_from_rows(rows, primary_headers, secondary_headers=[]):
   secondary_columns = [Column(header) for header in secondary_headers]
   matrix = make_matrix_from_columns(primary_columns + secondary_columns)
   for row in rows:
-    nodes = matrix.loop_through_circular_list(lambda x: x.right, lambda x: x.add_node_to_column_if_element_present(row))
-    nodes = [n for n in nodes if n is not None]
-    if len(nodes) > 0:
-      current_node = nodes[0]
-      for node in nodes:
-        current_node.insert_right(node)
-        current_node = node
+    matrix.add_row(row)
   for column in secondary_columns:
     column.make_secondary() # so find_exact_cover will not waste time covering columns that it's ok to leave uncovered (slight generalization of exact cover problem)
   return matrix
