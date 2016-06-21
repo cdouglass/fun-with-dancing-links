@@ -64,21 +64,27 @@ def make_matrix_row_for_move(x, y, digit):
   return [make_header(digit, kind, index) for kind, index in [["row", y], ["col", x], ["subgrid", subgrid_index]]]
 
 def convert_to_matrix(board):
-  # TODO
-    # 1. make rows for all possible plays in all currently empty spaces
-    # 2. make a matrix from these
-    # 3. make row for each ALREADY SET square
-    # 4. add all these rows to the matrix
-    # 5. cover all columns that these rows cover (make sure to include current node!)
-  pass
-  # columns: for each digit 1-9, one of each board row, one of each board column, and one of each board subgrid. this gives 243 columns. can't leave out those that are already covered
-  # rows: one for each digit 1-9 for each of the 81 squares (so 729) BUT once we've made the matrix we can cover 25 of them straight away plus all columns they covere and all rows that would cover any of the same columns (as on line 97 of exact_cover.py) which will make things a LOT smaller
+  all_coords = flatten([[[x, y] for x in range(0, 9)] for y in range(0, 9)]) # TODO is this worth pulling out as fn?
+  free_coords = [[x, y] for x, y in all_coords if board[y][x] == None]
+  filled_coords = [[x, y] for x, y in all_coords if board[y][x] != None]
+  possible_rows = flatten([[make_matrix_row_for_move(x, y, digit) for digit in allowed_values_at_coords(x, y, board)] \
+                   for x, y in free_coords])
+  filled_rows = [make_matrix_row_for_move(x, y, board[y][x]) for x, y in filled_coords]
+  matrix = lib.exact_cover.make_matrix_from_rows(possible_rows, column_headers())
+  filled_row_nodes = [matrix.add_row(row) for row in filled_rows]
+  for node in filled_row_nodes:
+    node.cover_all_other_columns_in_row()
+    node.column.cover_column()
+  return matrix
 
 # TODO later convert solution row set to board format so as to pass it on to view
 def validate_clue_set(board):
   matrix = convert_to_matrix(board)
-  solutions = lib.exact_cover.find_exact_cover(matrix)
-  return len(solutions == 1)
+  solutions = []
+  lib.exact_cover.find_exact_cover(matrix, solutions)
+  print("\nhow many solutions?")
+  print(len(solutions))
+  return len(solutions) == 1
 
 def generate_clue_set():
   clues = [[5,    3,    None, None, 7,    None, None, None, None],
