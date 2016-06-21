@@ -63,7 +63,7 @@ def make_matrix_row_for_move(x, y, digit):
   subgrid_index = 3 * (y // 3) + x // 3# across then down 
   return [make_header(digit, kind, index) for kind, index in [["row", y], ["col", x], ["subgrid", subgrid_index]]]
 
-def convert_to_matrix(board):
+def board_to_matrix(board):
   all_coords = flatten([[[x, y] for x in range(0, 9)] for y in range(0, 9)]) # TODO is this worth pulling out as fn?
   free_coords = [[x, y] for x, y in all_coords if board[y][x] == None]
   filled_coords = [[x, y] for x, y in all_coords if board[y][x] != None]
@@ -77,13 +77,30 @@ def convert_to_matrix(board):
     node.column.cover_column()
   return matrix
 
+def row_list_to_board(rows):
+  board = empty_board()
+  for row in rows: # this is giving nodes. i want headers. hmph.
+    print(row)
+    x = int([header.split("-") for header in row if "col" in header][0][-1]) # TODO pretty this up
+    y = int([header.split("-") for header in row if "row" in header][0][-1]) # TODO pretty this up
+    digit = int(row[0].split("-")[0])
+    board[y][x] = digit
+  return board
+
 # TODO later convert solution row set to board format so as to pass it on to view
 def validate_clue_set(board):
-  matrix = convert_to_matrix(board)
+  matrix = board_to_matrix(board)
   solutions = []
   lib.exact_cover.find_exact_cover(matrix, solutions)
+ # not using find_exact_cover_for_rows as with n_queens so result is in different format - array of nodes, not of header lists
+  solutions_as_row_lists = [[node.get_column_names_for_row() for node in soln] for soln in solutions]
+  print(type(solutions[0][0]))
+  solved_boards = [row_list_to_board(soln) for soln in solutions_as_row_lists]
   print("\nhow many solutions?")
   print(len(solutions))
+  # TODO this yields a solution in an improper form, with None in place of all givens
+  for b in solved_boards:
+    print(b)
   return len(solutions) == 1
 
 def generate_clue_set():

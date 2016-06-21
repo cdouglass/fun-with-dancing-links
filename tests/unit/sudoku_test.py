@@ -60,7 +60,7 @@ class TestUtilities(unittest.TestCase):
 
   # TODO
   def test_convert_board_to_matrix(self):
-    convert_to_matrix(self.empty_board)
+    board_to_matrix(self.empty_board)
 
   def test_allowed_values_on_partially_filled_board(self):
     partial_board = self.empty_board
