@@ -6,16 +6,44 @@ var board = $("#board"),
   r;
 
 function chooseRandomFromArr(arr) {
+  "use strict";
   var len = arr.length,
     index = Math.floor(Math.random() * len);
   return arr[index];
 }
 
-function tempHighlight(elt) {
-  elt.css('background-color', 'yellow');
-  setTimeout(function() {
-    elt.css({'background-color': 'inherit', 'transition-duration': '3s', 'transition-property': 'background-color'});
-  }, 1);
+function tempHighlight(elt, options) {
+  "use strict";
+  if (options === undefined) {
+    options = {color: 'yellow', duration: '3s', next: 'inherit'};
+  }
+  elt.css('background-color', options.color);
+  setTimeout(function () {
+    elt.css({'background-color': options.next, 'transition-duration': options.duration, 'transition-property': 'background-color'});
+  }, 10);
+}
+
+function rainbow(elt) {
+  "use strict";
+  setTimeout(function () {tempHighlight(elt, 'inherit', '1s', 'red');
+    setTimeout(function () {tempHighlight(elt, 'red', '1s', 'orange');
+      setTimeout(function () {tempHighlight(elt, 'orange', '1s', 'yellow');
+        setTimeout(function () {tempHighlight(elt, 'yellow', '1s', 'green');
+          setTimeout(function () {tempHighlight(elt, 'green', '1s', 'blue');
+            setTimeout(function () {tempHighlight(elt, 'blue', '1s', 'violet');
+              setTimeout(function () {tempHighlight(elt, 'violet', '1s', 'inherit');
+                }, 1000);
+              }, 1000);
+            }, 1000);
+          }, 1000);
+        }, 1000);
+      }, 1000);
+    }, 1000);
+}
+
+function getCoords(cell) {
+  "use strict";
+  return cell.attr('id').split("-");
 }
 
 function getCoords(cell) {
@@ -71,6 +99,9 @@ function getNumber(cell) {
     var value = parseInt(c.key, 10);
     if (isValidDigit(value)) {
       partialSolution[y][x] = value;
+      if (partialSolution.toString() === solution.toString()) {
+        rainbow($('.square'));
+      }
       redrawBoard();
     }
   });
@@ -85,7 +116,6 @@ function clear(cell) {
   redrawBoard();
 }
 
-// TODO something useful if everything's filled but there's an error
 function hint() {
   "use strict";
   var emptyCells = $.find('.square').filter(function (cell) {
