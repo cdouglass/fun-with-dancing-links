@@ -1,4 +1,52 @@
+import random
 import lib.exact_cover
+from lib.n_queens import flatten
+
+class InvalidBoard(Exception):
+  pass
+
+def empty_board():
+  board = []
+  for i in range(1, 10):
+    row = []
+    for j in range(1, 10):
+      row.append(None)
+    board.append(row)
+  return board
+
+def subgrid(x, y, board):
+  x_min, y_min = [3 * (i // 3) for i in [x, y]]
+  return [[val for val in row[x_min:x_min + 3]] for row in board[y_min:y_min + 3]]
+
+def allowed_values_at_coords(x, y, board):
+  row = [val for i, val in enumerate(board[y]) if i != x]
+  col = [r[x] for i, r in enumerate(board) if i != y]
+  sg = subgrid(x, y, board)
+  sg[y % 3][x % 3] = None 
+  subgrid_values = flatten(sg)
+  taken_values = {v for v in row} | {v for v in col} | {v for v in subgrid_values}
+  return {i for i in range(1,10) if i not in taken_values}
+
+def add_random_clue(board):
+  try:
+    y = random.choice([i for i in range(0, len(board)) if None in board[i]])
+    x = random.choice([i for i in range(0, len(board)) if board[y][i] == None])
+    options = allowed_values_at_coords(x, y, board)
+    board[y][x] = random.choice(list(options))
+  except(IndexError):
+    raise InvalidBoard
+
+def random_clue_set():
+  count = 0
+  board = empty_board()
+  while count < 25:
+    try:
+      add_random_clue(board)
+      count += 1
+    except(InvalidBoard):
+      count = 0
+      board = empty_board()
+  return board
 
 def generate_clue_set():
   clues = [[5,    3,    None, None, 7,    None, None, None, None],
