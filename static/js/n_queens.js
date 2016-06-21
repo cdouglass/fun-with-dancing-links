@@ -44,7 +44,7 @@ function pollBackgroundTask(responseUrl, taskId) {
     if (data.hasOwnProperty('result') && data.result.status !== 'PENDING') {
       solutions = data.result; // global
       $('#solution_count').text(solutions.length);
-      $('#solutions-info').delay(600).animate({opacity: 1}); // arg to show makes it into an animation, which lets delay affect it, which prevents this from showing before spinner has faded
+      $('#solutions-info').delay(600).animate({opacity: 1});
       $('button').prop('disabled', false);
       $('#spinner').finish();
       if (solutions.length > 0) {

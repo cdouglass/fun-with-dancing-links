@@ -1,9 +1,22 @@
 /*jslint browser: true, indent:2*/
-/*global $, clueSet*/
+/*global $, clueSet, solution*/
 var board = $("#board"),
   digits = [1, 2, 3, 4, 5, 6, 7, 8, 9],
-  currentSolution,
+  partialSolution,
   r;
+
+function chooseRandomFromArr(arr) {
+  var len = arr.length,
+    index = Math.floor(Math.random() * len);
+  return arr[index];
+}
+
+function tempHighlight(elt) {
+  elt.css('background-color', 'yellow');
+  setTimeout(function() {
+    elt.css({'background-color': 'inherit', 'transition-duration': '3s', 'transition-property': 'background-color'});
+  }, 1);
+}
 
 function getCoords(cell) {
   "use strict";
@@ -36,20 +49,15 @@ function isValidDigit(c) {
   return digits.indexOf(c) !== -1;
 }
 
-function isValidUnit(arr) {
-  "use strict";
-  var digitIndices = {}; // TODO empty arr for each digit, add indices, if any digit has >1 index do something
-}
-
-currentSolution = copyMatrix(clueSet);
+partialSolution = copyMatrix(clueSet);
 
 function redrawBoard() {
   "use strict";
   var x, y, cell;
-  for (x = 0; x < currentSolution.length; x += 1) {
-    for (y = 0; y < currentSolution.length; y += 1) {
+  for (x = 0; x < partialSolution.length; x += 1) {
+    for (y = 0; y < partialSolution.length; y += 1) {
       cell = getCell([x, y]);
-      cell.text(currentSolution[y][x]);
+      cell.text(partialSolution[y][x]);
     }
   }
 }
@@ -62,7 +70,7 @@ function getNumber(cell) {
   cell.on('keypress', function (c) {
     var value = parseInt(c.key, 10);
     if (isValidDigit(value)) {
-      currentSolution[y][x] = value;
+      partialSolution[y][x] = value;
       redrawBoard();
     }
   });
@@ -73,8 +81,29 @@ function clear(cell) {
   var coords = getCoords(cell),
     x = coords[0],
     y = coords[1];
-  currentSolution[y][x] = null;
+  partialSolution[y][x] = null;
   redrawBoard();
+}
+
+// TODO something useful if everything's filled but there's an error
+function hint() {
+  "use strict";
+  var emptyCells = $.find('.square').filter(function (cell) {
+    var empty = $(cell).text() === '';
+    return empty;
+  }),
+    cell = chooseRandomFromArr(emptyCells),
+    coords,
+    x,
+    y;
+  if (cell) {
+    coords = getCoords($(cell));
+    x = coords[0];
+    y = coords[1];
+    partialSolution[y][x] = solution[y][x];
+    tempHighlight($(cell));
+    redrawBoard();
+  }
 }
 
 $('.free').on('focus', function () {
@@ -89,6 +118,8 @@ $('.free').on('contextmenu', function () {
 
 $('#clear').on('click', function () { // also occurs on submitting via enter
   "use strict";
-  currentSolution = copyMatrix(clueSet);
+  partialSolution = copyMatrix(clueSet);
   redrawBoard();
 });
+
+$('#hint').on('click', hint);

@@ -26,8 +26,8 @@ def index():
 
 @app.route('/sudoku')
 def sudoku():
-  clue_set = lib.sudoku.generate_clue_set() # TODO null except where there's a number. 2d array
-  return flask.render_template('sudoku.html', clue_set = clue_set)
+  [clue_set, solution] = lib.sudoku.generate_clue_set() # TODO null except where there's a number. 2d array
+  return flask.render_template('sudoku.html', clue_set = clue_set, solution = solution)
 
 @app.route('/n_queens')
 def n_queens_default():

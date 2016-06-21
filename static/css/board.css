@@ -43,6 +43,8 @@
   border-right: 1px solid black;
 }
 
+/*CHESS*/
+
 .chess .square.light {
   background-color: whitesmoke;
 }
@@ -50,6 +52,8 @@
 .chess .square.dark {
   background-color: gray;
 }
+
+/*SUDOKU*/
 
 .given {
   font-weight: bold;
