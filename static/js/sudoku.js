@@ -25,6 +25,7 @@ function tempHighlight(elt, options) {
 
 function rainbow(elt) {
   "use strict";
+  console.log("RAINBOW");
   setTimeout(function () {tempHighlight(elt, 'inherit', '1s', 'red');
     setTimeout(function () {tempHighlight(elt, 'red', '1s', 'orange');
       setTimeout(function () {tempHighlight(elt, 'orange', '1s', 'yellow');
@@ -38,7 +39,7 @@ function rainbow(elt) {
           }, 1000);
         }, 1000);
       }, 1000);
-    }, 1000);
+    }, 1);
 }
 
 function getCoords(cell) {
@@ -100,6 +101,7 @@ function getNumber(cell) {
     if (isValidDigit(value)) {
       partialSolution[y][x] = value;
       if (partialSolution.toString() === solution.toString()) {
+        console.log("WHEEEE");
         rainbow($('.square'));
       }
       redrawBoard();

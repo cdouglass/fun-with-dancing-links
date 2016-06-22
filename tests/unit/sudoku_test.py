@@ -137,3 +137,8 @@ class TestCreateBoard(unittest.TestCase):
   def test_clues_are_valid(self):
     solutions = find_all_solutions(self.clues)
     self.assertEqual(flatten(self.solution), flatten(solutions[0])) # TODO
+
+  # TODO
+  def x_test_generate_clues(self):
+    print(generate_clue_set())
+    # TODO

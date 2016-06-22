@@ -36,10 +36,10 @@ def add_random_clue(board):
   except(IndexError):
     raise InvalidBoard
 
-def random_clue_set():
+def random_clue_set(n=25):
   count = 0
   board = empty_board()
-  while count < 25:
+  while count < n:
     try:
       add_random_clue(board)
       count += 1
@@ -87,33 +87,38 @@ def row_list_to_board(rows):
     board[y][x] = digit
   return board
 
+# TODO test
+def merge_boards(a, b):
+  board = empty_board()
+  for x, y in all_positions():
+    board[y][x] = a[y][x] or b[y][x]
+  return board
+
 def find_all_solutions(board):
   matrix = board_to_matrix(board)
   solutions = []
   lib.exact_cover.find_exact_cover(matrix, solutions)
  # not using find_exact_cover_for_rows as with n_queens so result is in different format - array of nodes, not of header lists
   solutions_as_row_lists = [[node.get_column_names_for_row() for node in soln] for soln in solutions]
-  solved_boards = [row_list_to_board(soln) for soln in solutions_as_row_lists]
-  # TODO this yields a solution in an improper form, with None in place of all givens
+  solved_boards = [merge_boards(board, row_list_to_board(soln)) for soln in solutions_as_row_lists]
   return solved_boards
 
+# currently takes about 1:15
 def generate_clue_set():
-  clues = [[5,    3,    None, None, 7,    None, None, None, None],
-           [6,    None, None, 1,    9,    5,    None, None, None],
-           [None, 9,    8,    None, None, None, None, 6,    None],
-           [8,    None, None, None, 6,    None, None, None, 3],
-           [4,    None, None, 8,    None, 3,    None, None, 1],
-           [7,    None, None, None, 2,    None, None, None, 6],
-           [None, 6,    None, None, None, None, 2,    8,    None],
-           [None, None, None, 4,    1,    9,    None, None, 5],
-           [None, None, None, None, 8,    None, None, 7,    9]]
-  solution = [[5, 3, 4, 6, 7, 8, 9, 1, 2],
-              [6, 7, 2, 1, 9, 5, 3, 4, 8],
-              [1, 9, 8, 3, 4, 2, 5, 6, 7],
-              [8, 5, 9, 7, 6, 1, 4, 2, 3],
-              [4, 2, 6, 8, 5, 3, 7, 9, 1],
-              [7, 1, 3, 9, 2, 4, 8, 5, 6],
-              [9, 6, 1, 5, 3, 7, 2, 8, 4],
-              [2, 8, 7, 4, 1, 9, 6, 3, 5],
-              [3, 4, 5, 2, 8, 6, 1, 7, 9]]
-  return [clues, solution]
+  clues = []
+  solutions = []
+  while len(solutions) != 1: # TODO pretty this up
+    print("trying again from scratch")
+    clues = random_clue_set(25)
+    # TODO try removing solutions once a satisfactory puzzle is found
+    solutions = find_all_solutions(clues)
+    while len(solutions) > 1:
+      goal = solutions[0]
+      y = random.choice([i for i in range(0, len(clues)) if None in clues[i]]) # TODO repeated from add_random_clue
+      x = random.choice([i for i in range(0, len(clues)) if clues[y][i] == None])
+      clues[y][x] = goal[y][x]
+      solutions = find_all_solutions(clues)
+      print("found %s solutions to the following clue set:" %len(solutions))
+      for r in clues:
+        print(r)
+  return [clues, solutions[0]]
