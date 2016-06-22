@@ -52,14 +52,14 @@ class TestUtilities(unittest.TestCase):
     self.assertEqual(set(range(1, 10)), allowed_values_at_coords(1, 4, self.empty_board))
 
   def test_all_column_headers(self):
-    self.assertEqual(243, len(column_headers()))
+    self.assertEqual(324, len(column_headers()))
 
   def test_make_matrix_row_for_move(self):
     row = make_matrix_row_for_move(7, 3, 9)
-    self.assertEqual(["9-row-3", "9-col-7", "9-subgrid-5"], row)
+    self.assertEqual(["9-row-3", "9-col-7", "9-subgrid-5", "7-cell-3"], row)
 
   # TODO
-  def test_convert_board_to_matrix(self):
+  def x_test_convert_board_to_matrix(self):
     board_to_matrix(self.empty_board)
 
   def test_allowed_values_on_partially_filled_board(self):
@@ -115,25 +115,15 @@ class TestCreateBoard(unittest.TestCase):
   def setUp(self):
     n = None # to save space
     self.a = 1
-   # self.clues = [[5,    3,    None, None, 7,    None, None, None, None],
-   #               [6,    None, None, 1,    9,    5,    None, None, None],
-   #               [None, 9,    8,    None, None, None, None, 6,    None],
-   #               [8,    None, None, None, 6,    None, None, None, 3],
-   #               [4,    None, None, 8,    None, 3,    None, None, 1],
-   #               [7,    None, None, None, 2,    None, None, None, 6],
-   #               [None, 6,    None, None, None, None, 2,    8,    None],
-   #               [None, None, None, 4,    1,    9,    None, None, 5],
-   #               [None, None, None, None, 8,    None, None, 7,    9]]
-    self.clues = [[5, 3, n, 6, 7, 8, 9, n, 2],
-                  [6, 7, n, 1, 9, 5, 3, n, 8], # for this clue set, it's claiming to find TWO solutions, not one!
-                  [1, 9, 8, 3, 4, 2, 5, 6, 7], # so this should be a good start for finding the problem.
-                  [8, 5, 9, 7, 6, 1, 4, 2, 3],
-                  [4, 2, 6, 8, 5, 3, 7, 9, 1],
-                  [7, 1, 3, 9, 2, 4, 8, 5, 6],
-                  [9, 6, 1, 5, 3, 7, 2, 8, 4],
-                  [2, 8, 7, 4, 1, 9, 6, 3, 5],
-                  [3, 4, 5, 2, 8, 6, 1, 7, 9]]
-
+    self.clues = [[5,    3,    None, None, 7,    None, None, None, None],
+                  [6,    None, None, 1,    9,    5,    None, None, None],
+                  [None, 9,    8,    None, None, None, None, 6,    None],
+                  [8,    None, None, None, 6,    None, None, None, 3],
+                  [4,    None, None, 8,    None, 3,    None, None, 1],
+                  [7,    None, None, None, 2,    None, None, None, 6],
+                  [None, 6,    None, None, None, None, 2,    8,    None],
+                  [None, None, None, 4,    1,    9,    None, None, 5],
+                  [None, None, None, None, 8,    None, None, 7,    9]]
     self.solution = [[5, 3, 4, 6, 7, 8, 9, 1, 2],
                      [6, 7, 2, 1, 9, 5, 3, 4, 8],
                      [1, 9, 8, 3, 4, 2, 5, 6, 7],
@@ -145,4 +135,5 @@ class TestCreateBoard(unittest.TestCase):
                      [3, 4, 5, 2, 8, 6, 1, 7, 9]]
 
   def test_clues_are_valid(self):
-    self.assertTrue(validate_clue_set(self.clues))
+    solutions = find_all_solutions(self.clues)
+    self.assertEqual(flatten(self.solution), flatten(solutions[0])) # TODO
