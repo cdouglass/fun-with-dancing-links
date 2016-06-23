@@ -97,14 +97,22 @@ class Column(Node):
 
 # Algorithm
 
-def find_exact_cover(matrix, full_solutions = [], partial_solution = []):
+def next_column(matrix):
+  return matrix.right
+
+def find_exact_cover(matrix, full_solutions = None, partial_solution = None):
+  # Python creates default argument objects when function is defined
+  if full_solutions is None:
+    full_solutions = []
+  if partial_solution is None:
+    partial_solution = []
   if matrix.right == matrix:
     full_solutions.append(partial_solution.copy())
     partial_solution == [] # terminate successfully
   elif matrix.right.up == matrix.right:
     partial_solution == [] # terminate unsuccessfully
   else:
-    column = matrix.right
+    column = next_column(matrix)
     column.cover_column()
     rows_in_column = column.loop_through_circular_list(lambda x: x.down, lambda x: x) # [Node]
     for row in rows_in_column:
@@ -114,13 +122,13 @@ def find_exact_cover(matrix, full_solutions = [], partial_solution = []):
       row.uncover_all_other_columns_in_row()
       partial_solution.pop()
     column.uncover_column() # restore matrix to original state
+  return full_solutions
 
 # convenience
 # [str], [[str]] -> [[[str]]]
 def find_exact_cover_for_rows(rows, primary_headers, secondary_headers=[]):
-  solutions = []
   matrix = make_matrix_from_rows(rows, primary_headers, secondary_headers)
-  find_exact_cover(matrix, solutions)
+  solutions = find_exact_cover(matrix)
   return [[node.get_column_names_for_row() for node in sol] for sol in solutions]
 
 # Matrix manipulation

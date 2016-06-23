@@ -205,25 +205,22 @@ class TestAlgorithm(unittest.TestCase):
     rows = [['a', 'd', 'f'], ['a', 'd', 'g'], ['b', 'c', 'f'],
             ['b', 'g'], ['c', 'e', 'f'], ['d', 'e', 'g']]
     matrix = make_matrix_from_rows(rows, self.names)
-    solutions = []
-    find_exact_cover(matrix, solutions, [])
+    solutions = find_exact_cover(matrix)
     self.assertEqual([], solutions)
 
   def test_finds_solution_on_simple_matrix(self):
-    solutions = []
-    find_exact_cover(self.unique_solution_matrix, solutions, [])
+    solutions = find_exact_cover(self.unique_solution_matrix)
     pretty_solutions = sorted([[sorted(row.get_column_names_for_row())
                                 for row in solution]
                               for solution in solutions])
-    self.assertEqual(self.unique_solution, pretty_solutions)
     self.assertEqual(1, len(solutions))
+    self.assertEqual(self.unique_solution, pretty_solutions)
     rows = sorted(make_rows_from_matrix(self.unique_solution_matrix)) # confirm matrix unchanged
     self.assertEqual(rows, self.unique_solution_rows)
 
   def test_finds_multiple_solutions_on_matrix(self):
     multiple_solutions_matrix = make_matrix_from_rows(self.multiple_solutions_rows, self.names)
-    solutions = []
-    find_exact_cover(multiple_solutions_matrix, solutions, [])
+    solutions = find_exact_cover(multiple_solutions_matrix)
     solutions_as_row_lists = [[row.get_column_names_for_row() for row in sol] for sol in solutions]
     self.assertEqual(self.expected_multiple_solutions, standardize_solution_set(solutions_as_row_lists))
     self.assertEqual(3, len(solutions))
