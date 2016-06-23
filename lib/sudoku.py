@@ -27,27 +27,6 @@ def allowed_values_at_coords(x, y, board):
   taken_values = {v for v in row} | {v for v in col} | {v for v in subgrid_values}
   return {i for i in range(1,10) if i not in taken_values}
 
-def add_random_clue(board):
-  try:
-    y = random.choice([i for i in range(0, len(board)) if None in board[i]])
-    x = random.choice([i for i in range(0, len(board)) if board[y][i] == None])
-    options = allowed_values_at_coords(x, y, board)
-    board[y][x] = random.choice(list(options))
-  except(IndexError):
-    raise InvalidBoard
-
-def random_clue_set(n=25):
-  count = 0
-  board = empty_board()
-  while count < n:
-    try:
-      add_random_clue(board)
-      count += 1
-    except(InvalidBoard):
-      count = 0
-      board = empty_board()
-  return board
-
 def all_positions():
   return flatten([[[x, y] for x in range(0, 9)] for y in range(0, 9)])
 
@@ -103,6 +82,11 @@ def find_all_solutions(board):
   solved_boards = [merge_boards(board, row_list_to_board(soln)) for soln in solutions_as_row_lists]
   return solved_boards
 
+def random_clue_set(n = 25):
+  matrix = board_to_matrix(empty_board())
+  partial_board_row_list = [node.get_column_names_for_row() for node in lib.exact_cover.find_partial_cover(matrix, n)] # TODO pull out method for this
+  return row_list_to_board(partial_board_row_list)
+
 # currently takes about 1:15
 def generate_clue_set():
   clues = []
@@ -114,7 +98,7 @@ def generate_clue_set():
     solutions = find_all_solutions(clues)
     while len(solutions) > 1:
       goal = solutions[0]
-      y = random.choice([i for i in range(0, len(clues)) if None in clues[i]]) # TODO repeated from add_random_clue
+      y = random.choice([i for i in range(0, len(clues)) if None in clues[i]]) # TODO covering this way is pretty silly - should do everything as matrix
       x = random.choice([i for i in range(0, len(clues)) if clues[y][i] == None])
       clues[y][x] = goal[y][x]
       solutions = find_all_solutions(clues)

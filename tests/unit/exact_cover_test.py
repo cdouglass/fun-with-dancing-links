@@ -253,3 +253,21 @@ class TestAlgorithm(unittest.TestCase):
                   ["d-"]] # diagonals should be covered AT MOST once - these can bring it up to 1
     sols = find_exact_cover_for_rows(placements, names)
     self.assertEqual(1, len(sols))
+
+class TestPartialSolutions(unittest.TestCase):
+
+  def setUp(self):
+    self.names = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+    self.unique_solution_rows = [['a', 'd'], ['a', 'd', 'g'], ['b', 'c', 'f'],
+            ['b', 'g'], ['c', 'e', 'f'], ['d', 'e', 'g']]
+    self.unique_solution_matrix = make_matrix_from_rows(self.unique_solution_rows, self.names)
+    self.unique_solution = [[['a', 'd'], ['b', 'g'], ['c', 'e', 'f']]]
+
+  def test_finds_partial_solution_of_full_length(self):
+    partial = find_partial_cover(self.unique_solution_matrix, 3)
+    pretty = [sorted(row.get_column_names_for_row()) for row in partial]
+    self.assertEqual(self.unique_solution[0], pretty) # TODO WHOA WHOA WHOA it works!
+
+  def test_finds_partial_solution_of_shorter_length(self):
+    partial = find_partial_cover(self.unique_solution_matrix, 2)
+    self.assertEqual(2, len(partial)) # TODO WHOA WHOA WHOA it works!

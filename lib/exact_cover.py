@@ -1,3 +1,5 @@
+import random
+
 class InvalidLooping(Exception):
   
   def __init__(self):
@@ -100,13 +102,47 @@ class Column(Node):
 def next_column(matrix):
   return matrix.right
 
+# TODO clean it up
+def pick_random_column(matrix):
+  all_columns = []
+  matrix.loop_through_circular_list(lambda x: x.right, lambda x: all_columns.append(x))
+  return random.choice(all_columns)
+
+def is_matrix_empty(matrix):
+  return matrix.right == matrix
+
+# TODO pull out parts of this that match find_exact_cover, for DRY
+# TODO before that, write a test
+def find_partial_cover(matrix, size, partial_solution = None):
+  done = lambda sol: len(sol) >= size # apply to partial_solution
+  if partial_solution is None:
+    partial_solution = []
+  if done(partial_solution):
+    return partial_solution
+  elif matrix.right.up == matrix.right: # terminate unsuccessfully - there's a column we can't cover
+    partial_solution = [] 
+  else:
+    column = pick_random_column(matrix) # TODO random instead - for now this will be deterministic
+    column.cover_column()
+    rows_in_column = column.loop_through_circular_list(lambda x: x.down, lambda x: x)
+    for row in rows_in_column:
+      partial_solution.append(row)
+      row.cover_all_other_columns_in_row()
+      find_partial_cover(matrix, size, partial_solution) # TODO is this right?
+      row.uncover_all_other_columns_in_row()
+      if done(partial_solution): # TODO this is awfully repetitive
+        return partial_solution
+      else:
+        partial_solution.pop()
+    column.uncover_column()
+
 def find_exact_cover(matrix, full_solutions = None, partial_solution = None):
   # Python creates default argument objects when function is defined
   if full_solutions is None:
     full_solutions = []
   if partial_solution is None:
     partial_solution = []
-  if matrix.right == matrix:
+  if is_matrix_empty(matrix):
     full_solutions.append(partial_solution.copy())
     partial_solution == [] # terminate successfully
   elif matrix.right.up == matrix.right:
