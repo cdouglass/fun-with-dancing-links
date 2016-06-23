@@ -19,27 +19,26 @@ function tempHighlight(elt, options) {
   }
   elt.css('background-color', options.color);
   setTimeout(function () {
-    elt.css({'background-color': options.next, 'transition-duration': options.duration, 'transition-property': 'background-color'});
+    elt.css({'background-color': options.next, 'transition-duration': options.duration, 'transition-property': 'background-color', 'transition-timing-function': 'ease-in-out'});
   }, 10);
 }
 
 function rainbow(elt) {
   "use strict";
   console.log("RAINBOW");
-  setTimeout(function () {tempHighlight(elt, 'inherit', '1s', 'red');
-    setTimeout(function () {tempHighlight(elt, 'red', '1s', 'orange');
-      setTimeout(function () {tempHighlight(elt, 'orange', '1s', 'yellow');
-        setTimeout(function () {tempHighlight(elt, 'yellow', '1s', 'green');
-          setTimeout(function () {tempHighlight(elt, 'green', '1s', 'blue');
-            setTimeout(function () {tempHighlight(elt, 'blue', '1s', 'violet');
-              setTimeout(function () {tempHighlight(elt, 'violet', '1s', 'inherit');
-                }, 1000);
-              }, 1000);
-            }, 1000);
-          }, 1000);
-        }, 1000);
-      }, 1000);
-    }, 1);
+  tempHighlight(elt, {color: 'inherit', duration: '1s', next: 'red'});
+    setTimeout(function () {tempHighlight(elt, {color: 'red', duration: '1s', next: 'orange'});
+      setTimeout(function () {tempHighlight(elt, {color: 'orange', duration: '1s', next: 'yellow'});
+        setTimeout(function () {tempHighlight(elt, {color: 'yellow', duration: '1s', next: 'green'});
+          setTimeout(function () {tempHighlight(elt, {color: 'green', duration: '1s', next: 'blue'});
+            setTimeout(function () {tempHighlight(elt, {color: 'blue', duration: '1s', next: 'violet'});
+              setTimeout(function () {tempHighlight(elt, {color: 'violet', duration: '1s', next: 'inherit'});
+                }, 800);
+              }, 800);
+            }, 800);
+          }, 800);
+        }, 800);
+      }, 800);
 }
 
 function getCoords(cell) {
