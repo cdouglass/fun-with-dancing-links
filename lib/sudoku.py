@@ -73,10 +73,10 @@ def merge_boards(a, b):
     board[y][x] = a[y][x] or b[y][x]
   return board
 
-def find_all_solutions(board):
+def find_n_solutions(board, n):
   matrix = board_to_matrix(board)
   solutions = []
-  lib.exact_cover.find_exact_cover(matrix, solutions)
+  lib.exact_cover.find_n_exact_covers(matrix, n, solutions)
  # not using find_exact_cover_for_rows as with n_queens so result is in different format - array of nodes, not of header lists
   solutions_as_row_lists = [[node.get_column_names_for_row() for node in soln] for soln in solutions]
   solved_boards = [merge_boards(board, row_list_to_board(soln)) for soln in solutions_as_row_lists]
@@ -95,13 +95,13 @@ def generate_clue_set():
     print("trying again from scratch")
     clues = random_clue_set(25)
     # TODO try removing solutions once a satisfactory puzzle is found
-    solutions = find_all_solutions(clues)
+    solutions = find_n_solutions(clues, 2)
     while len(solutions) > 1:
       goal = solutions[0]
       y = random.choice([i for i in range(0, len(clues)) if None in clues[i]]) # TODO covering this way is pretty silly - should do everything as matrix
       x = random.choice([i for i in range(0, len(clues)) if clues[y][i] == None])
       clues[y][x] = goal[y][x]
-      solutions = find_all_solutions(clues)
+      solutions = find_n_solutions(clues, 2)
       print("found %s solutions to the following clue set:" %len(solutions))
       for r in clues:
         print(r)

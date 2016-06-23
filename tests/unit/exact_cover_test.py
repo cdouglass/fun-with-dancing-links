@@ -265,9 +265,9 @@ class TestPartialSolutions(unittest.TestCase):
 
   def test_finds_partial_solution_of_full_length(self):
     partial = find_partial_cover(self.unique_solution_matrix, 3)
-    pretty = [sorted(row.get_column_names_for_row()) for row in partial]
-    self.assertEqual(self.unique_solution[0], pretty) # TODO WHOA WHOA WHOA it works!
+    pretty = sorted([sorted(row.get_column_names_for_row()) for row in partial])
+    self.assertEqual(self.unique_solution[0], pretty)
 
   def test_finds_partial_solution_of_shorter_length(self):
     partial = find_partial_cover(self.unique_solution_matrix, 2)
-    self.assertEqual(2, len(partial)) # TODO WHOA WHOA WHOA it works!
+    self.assertEqual(2, len(partial))

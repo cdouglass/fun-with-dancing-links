@@ -118,7 +118,7 @@ class TestCreateBoard(unittest.TestCase):
                      [3, 4, 5, 2, 8, 6, 1, 7, 9]]
 
   def test_clues_are_valid(self):
-    solutions = find_all_solutions(self.clues)
+    solutions = find_n_solutions(self.clues, 2)
     self.assertEqual(flatten(self.solution), flatten(solutions[0])) # TODO
 
   # TODO

@@ -136,6 +136,35 @@ def find_partial_cover(matrix, size, partial_solution = None):
         partial_solution.pop()
     column.uncover_column()
 
+# TODO ewwwwww
+def find_n_exact_covers(matrix, n, full_solutions = None, partial_solution = None):
+  if full_solutions is None:
+    full_solutions = []
+  if partial_solution is None:
+    partial_solution = []
+  if is_matrix_empty(matrix):
+    full_solutions.append(partial_solution.copy())
+    partial_solution == [] # terminate successfully
+    if len(full_solutions) >= n:
+      return full_solutions
+  elif matrix.right.up == matrix.right:
+    partial_solution == []
+  else:
+    column = next_column(matrix)
+    column.cover_column()
+    rows_in_column = column.loop_through_circular_list(lambda x: x.down, lambda x: x)
+    for row in rows_in_column:
+      partial_solution.append(row)
+      row.cover_all_other_columns_in_row()
+      find_n_exact_covers(matrix, n, full_solutions, partial_solution)
+      if len(full_solutions) >= n:
+        return full_solutions
+      row.uncover_all_other_columns_in_row()
+      partial_solution.pop()
+    column.uncover_column() # restore matrix to original state
+  return full_solutions
+      
+
 def find_exact_cover(matrix, full_solutions = None, partial_solution = None):
   # Python creates default argument objects when function is defined
   if full_solutions is None:
