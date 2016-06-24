@@ -7,8 +7,8 @@ import unittest
 
 # Column -> bool
 def is_valid_column(column):
-  horizontal_moves = [lambda x: x.right, lambda x: x.left]
-  vertical_moves = [lambda x: x.down, lambda x: x.up]
+  horizontal_moves = ['right', 'left']
+  vertical_moves = ['down', 'up']
   if not all([check_circularity(v_move, column) for v_move in vertical_moves]): # check column is circular both ways
     return False
   else: # moving downward, checks each row is circular both ways
@@ -20,7 +20,7 @@ def is_valid_column(column):
 # does not check that lists have same connections in each direction
 # Root -> bool
 def is_valid_matrix(matrix):
-  horizontal_moves = [lambda x: x.right, lambda x: x.left]
+  horizontal_moves = ['right', 'left']
   for h_move in horizontal_moves:
     if not (check_circularity(h_move, matrix) and
            all(matrix.loop_through_circular_list(h_move, is_valid_column))):
