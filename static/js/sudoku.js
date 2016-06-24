@@ -17,28 +17,41 @@ function tempHighlight(elt, options) {
   if (options === undefined) {
     options = {color: 'yellow', duration: '3s', next: 'inherit'};
   }
-  elt.css('background-color', options.color);
+  elt.css({'background-color': options.color, 'transition-property': 'background-color', 'transition-duration': '0s'});
   setTimeout(function () {
-    elt.css({'background-color': options.next, 'transition-duration': options.duration, 'transition-property': 'background-color', 'transition-timing-function': 'ease-in-out'});
+    elt.css({'background-color': options.next, 'transition-property': 'background-color', 'transition-duration': options.duration});
   }, 10);
 }
 
+
 function rainbow(elt) {
   "use strict";
-  console.log("RAINBOW");
-  tempHighlight(elt, {color: 'inherit', duration: '1s', next: 'red'});
-    setTimeout(function () {tempHighlight(elt, {color: 'red', duration: '1s', next: 'orange'});
-      setTimeout(function () {tempHighlight(elt, {color: 'orange', duration: '1s', next: 'yellow'});
-        setTimeout(function () {tempHighlight(elt, {color: 'yellow', duration: '1s', next: 'green'});
-          setTimeout(function () {tempHighlight(elt, {color: 'green', duration: '1s', next: 'blue'});
-            setTimeout(function () {tempHighlight(elt, {color: 'blue', duration: '1s', next: 'violet'});
-              setTimeout(function () {tempHighlight(elt, {color: 'violet', duration: '1s', next: 'inherit'});
-                }, 800);
-              }, 800);
-            }, 800);
-          }, 800);
-        }, 800);
-      }, 800);
+  var hue = 0;
+  function makeColor(h) {
+    return 'hsl(' + h + ', 100%, 50%)';
+  }
+  function nextColor() {
+    var inc = 32;
+    hue += inc;
+    tempHighlight(elt, {color: makeColor(hue - inc), duration: '1s', next: makeColor(hue)});
+  }
+  nextColor();
+  setTimeout(function () { nextColor();
+    setTimeout(function () { nextColor();
+      setTimeout(function () { nextColor();
+        setTimeout(function () { nextColor();
+          setTimeout(function () { nextColor();
+              setTimeout(function () { nextColor();
+                setTimeout(function () { nextColor();
+                  setTimeout(function () { nextColor();
+                  }, 1000);
+                }, 1000);
+              }, 1000);
+            }, 1000);
+          }, 1000);
+        }, 1000);
+      }, 1000);
+    }, 1000);
 }
 
 function getCoords(cell) {
@@ -100,7 +113,6 @@ function getNumber(cell) {
     if (isValidDigit(value)) {
       partialSolution[y][x] = value;
       if (partialSolution.toString() === solution.toString()) {
-        console.log("WHEEEE");
         rainbow($('.square'));
       }
       redrawBoard();
