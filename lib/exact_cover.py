@@ -99,6 +99,7 @@ class Column(Node):
 
 # Algorithm
 
+# TODO choose most constrained instead, only using position to break ties
 def next_column(matrix):
   return matrix.right
 
@@ -166,7 +167,6 @@ def find_n_exact_covers(matrix, n, full_solutions = None, partial_solution = Non
       
 
 def find_exact_cover(matrix, full_solutions = None, partial_solution = None):
-  # Python creates default argument objects when function is defined
   if full_solutions is None:
     full_solutions = []
   if partial_solution is None:

@@ -87,22 +87,21 @@ def random_clue_set(n = 25):
   partial_board_row_list = [node.get_column_names_for_row() for node in lib.exact_cover.find_partial_cover(matrix, n)] # TODO pull out method for this
   return row_list_to_board(partial_board_row_list)
 
+def random_empty_coords(board):
+  y = random.choice([i for i in range(0, len(board)) if None in board[i]])
+  x = random.choice([i for i in range(0, len(board)) if board[y][i] == None])
+  return [x, y]
+
 # currently takes about 1:15
 def generate_clue_set():
   clues = []
   solutions = []
-  while len(solutions) != 1: # TODO pretty this up
-    print("trying again from scratch")
+  while len(solutions) != 1:
     clues = random_clue_set(25)
-    # TODO try removing solutions once a satisfactory puzzle is found
-    solutions = find_n_solutions(clues, 2)
+    solutions = find_n_solutions(clues, 2) # only need to know existence and uniqueness
     while len(solutions) > 1:
-      goal = solutions[0]
-      y = random.choice([i for i in range(0, len(clues)) if None in clues[i]]) # TODO covering this way is pretty silly - should do everything as matrix
-      x = random.choice([i for i in range(0, len(clues)) if clues[y][i] == None])
-      clues[y][x] = goal[y][x]
+      goal = solutions[0] 
+      x, y = random_empty_coords(clues)
+      clues[y][x] = goal[y][x] # TODO covering this way is silly - why not stay as matrix all along?
       solutions = find_n_solutions(clues, 2)
-      print("found %s solutions to the following clue set:" %len(solutions))
-      for r in clues:
-        print(r)
   return [clues, solutions[0]]
