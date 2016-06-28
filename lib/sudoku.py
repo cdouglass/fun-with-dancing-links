@@ -84,7 +84,7 @@ def find_n_solutions(board, n):
 
 def random_clue_set(n = 25):
   matrix = board_to_matrix(empty_board())
-  partial_board_row_list = [node.get_column_names_for_row() for node in lib.exact_cover.find_partial_cover(matrix, n)] # TODO pull out method for this
+  partial_board_row_list = [node.get_column_names_for_row() for node in lib.exact_cover.find_partial_cover(matrix, n)[0]] # TODO pull out method for this
   return row_list_to_board(partial_board_row_list)
 
 def random_empty_coords(board):
