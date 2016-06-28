@@ -100,6 +100,7 @@ class Column(Node):
 
 # Algorithm
 
+# TODO most constrained instead
 def next_column(matrix):
   return matrix.right
 
@@ -111,62 +112,24 @@ def pick_random_column(matrix):
 def is_matrix_empty(matrix):
   return matrix.right == matrix
 
-# TODO pull out parts of this that match find_exact_cover, for DRY
-def find_partial_cover(matrix, size, partial_solution = None):
-  done = lambda: len(partial_solution) >= size
-  if partial_solution is None:
-    partial_solution = []
-  if done():
-    return [partial_solution]
-  elif matrix.right.up == matrix.right: # terminate unsuccessfully - there's a column we can't cover
-    partial_solution = [] 
-  else:
-    column = pick_random_column(matrix)
-    column.cover_column()
-    rows_in_column = column.loop_through_circular_list('down', lambda x: x)
-    for row in rows_in_column:
-      partial_solution.append(row)
-      row.cover_all_other_columns_in_row()
-      find_partial_cover(matrix, size, partial_solution)
-      row.uncover_all_other_columns_in_row()
-      if done():
-        return [partial_solution]
-      else:
-        partial_solution.pop()
-    column.uncover_column()
-  return [partial_solution]
+def find_partial_cover(matrix, size):
+  partial_solution = []
+  result = [[]]
+  def done():
+    if len(partial_solution) >= size:
+      result[0] = partial_solution.copy()
+      return True
+  find_exact_covers(matrix, None, partial_solution, done, pick_random_column) # using side effect from done
+  return result[0]
 
-def find_n_exact_covers(matrix, n, full_solutions = None, partial_solution = None):
+def find_n_exact_covers(matrix, n):
+  full_solutions = [] # initialize here so done() has a handle to it
   done = lambda: len(full_solutions) >= n
-  if full_solutions is None:
-    full_solutions = []
-  if partial_solution is None:
-    partial_solution = []
-  if is_matrix_empty(matrix):
-    full_solutions.append(partial_solution.copy())
-    partial_solution == [] # terminate successfully
-    if done():
-      return full_solutions
-  elif matrix.right.up == matrix.right:
-    partial_solution == []
-  else:
-    column = next_column(matrix)
-    column.cover_column()
-    rows_in_column = column.loop_through_circular_list('down', lambda x: x)
-    for row in rows_in_column:
-      partial_solution.append(row)
-      row.cover_all_other_columns_in_row()
-      find_n_exact_covers(matrix, n, full_solutions, partial_solution)
-      if done():
-        return full_solutions
-      row.uncover_all_other_columns_in_row()
-      partial_solution.pop()
-    column.uncover_column() # restore matrix to original state
-  return full_solutions
-      
+  return find_exact_covers(matrix, full_solutions, None, done)
 
-def find_exact_cover(matrix, full_solutions = None, partial_solution = None):
-  done = lambda: False
+def find_exact_covers(matrix, full_solutions = None, partial_solution = None, done = lambda: False, next_col = next_column):
+  if done():
+    return full_solutions
   # Python creates default argument objects when function is defined
   if full_solutions is None:
     full_solutions = []
@@ -174,20 +137,15 @@ def find_exact_cover(matrix, full_solutions = None, partial_solution = None):
     partial_solution = []
   if is_matrix_empty(matrix):
     full_solutions.append(partial_solution.copy())
-    partial_solution == [] # terminate successfully
-    if done():
-      return full_solutions
-  elif matrix.right.up == matrix.right:
-    partial_solution == [] # terminate unsuccessfully
-  else:
-    column = next_column(matrix)
+  elif matrix.right.up != matrix.right:
+    column = next_col(matrix)
     column.cover_column()
     rows_in_column = column.loop_through_circular_list('down', lambda x: x) # [Node]
     for row in rows_in_column:
       partial_solution.append(row)
       row.cover_all_other_columns_in_row()
-      find_exact_cover(matrix, full_solutions, partial_solution)
-      if done():
+      find_exact_covers(matrix, full_solutions, partial_solution, done, next_col)
+      if done(): # lets find_partial_cover return sooner
         return full_solutions
       row.uncover_all_other_columns_in_row()
       partial_solution.pop()
@@ -198,7 +156,7 @@ def find_exact_cover(matrix, full_solutions = None, partial_solution = None):
 # [str], [[str]] -> [[[str]]]
 def find_exact_cover_for_rows(rows, primary_headers, secondary_headers=[]):
   matrix = make_matrix_from_rows(rows, primary_headers, secondary_headers)
-  solutions = find_exact_cover(matrix)
+  solutions = find_exact_covers(matrix)
   return [[node.get_column_names_for_row() for node in sol] for sol in solutions]
 
 # Matrix manipulation

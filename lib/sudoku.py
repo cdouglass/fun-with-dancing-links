@@ -73,19 +73,11 @@ def merge_boards(a, b):
     board[y][x] = a[y][x] or b[y][x]
   return board
 
-def find_n_solutions(board, n):
-  matrix = board_to_matrix(board)
-  solutions = []
-  lib.exact_cover.find_n_exact_covers(matrix, n, solutions)
- # not using find_exact_cover_for_rows as with n_queens so result is in different format - array of nodes, not of header lists
-  solutions_as_row_lists = [[node.get_column_names_for_row() for node in soln] for soln in solutions]
-  solved_boards = [merge_boards(board, row_list_to_board(soln)) for soln in solutions_as_row_lists]
-  return solved_boards
-
 def random_clue_set(n = 25):
   matrix = board_to_matrix(empty_board())
-  partial_board_row_list = [node.get_column_names_for_row() for node in lib.exact_cover.find_partial_cover(matrix, n)[0]] # TODO pull out method for this
-  return row_list_to_board(partial_board_row_list)
+  nodes = lib.exact_cover.find_partial_cover(matrix, n)
+  rows = [node.get_column_names_for_row() for node in nodes]
+  return row_list_to_board(rows)
 
 def random_empty_coords(board):
   y = random.choice([i for i in range(0, len(board)) if None in board[i]])
@@ -98,10 +90,13 @@ def generate_clue_set():
   solutions = []
   while len(solutions) != 1:
     clues = random_clue_set(25)
-    solutions = find_n_solutions(clues, 2) # only need to know existence and uniqueness
+    matrix = board_to_matrix(clues)
+    solutions = lib.exact_cover.find_n_exact_covers(matrix, 2) # only need to know existence and uniqueness
+    print("found at least %s solutions" %len(solutions), sys.stderr)
     while len(solutions) > 1:
-      goal = solutions[0] 
+      goal = row_list_to_board([node.get_column_names_for_row() for node in solutions[0]])
       x, y = random_empty_coords(clues)
-      clues[y][x] = goal[y][x] # TODO covering this way is silly - why not stay as matrix all along?
-      solutions = find_n_solutions(clues, 2)
+      clues[y][x] = goal[y][x]
+      matrix = board_to_matrix(clues)
+      solutions = lib.exact_cover.find_n_exact_covers(matrix, 2)
   return [clues, solutions[0]]

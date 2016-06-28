@@ -3,7 +3,16 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 
 from lib.exact_cover import *
+from lib.n_queens import flatten
 import unittest
+
+def included_in(elt, lst):
+  if len(lst) == 0:
+    return False
+  elif elt == lst[0]:
+    return True
+  else:
+    return included_in(elt, lst[1:len(lst)])
 
 # Column -> bool
 def is_valid_column(column):
@@ -205,11 +214,11 @@ class TestAlgorithm(unittest.TestCase):
     rows = [['a', 'd', 'f'], ['a', 'd', 'g'], ['b', 'c', 'f'],
             ['b', 'g'], ['c', 'e', 'f'], ['d', 'e', 'g']]
     matrix = make_matrix_from_rows(rows, self.names)
-    solutions = find_exact_cover(matrix)
+    solutions = find_exact_covers(matrix)
     self.assertEqual([], solutions)
 
   def test_finds_solution_on_simple_matrix(self):
-    solutions = find_exact_cover(self.unique_solution_matrix)
+    solutions = find_exact_covers(self.unique_solution_matrix)
     pretty_solutions = sorted([[sorted(row.get_column_names_for_row())
                                 for row in solution]
                               for solution in solutions])
@@ -220,7 +229,7 @@ class TestAlgorithm(unittest.TestCase):
 
   def test_finds_multiple_solutions_on_matrix(self):
     multiple_solutions_matrix = make_matrix_from_rows(self.multiple_solutions_rows, self.names)
-    solutions = find_exact_cover(multiple_solutions_matrix)
+    solutions = find_exact_covers(multiple_solutions_matrix)
     solutions_as_row_lists = [[row.get_column_names_for_row() for row in sol] for sol in solutions]
     self.assertEqual(self.expected_multiple_solutions, standardize_solution_set(solutions_as_row_lists))
     self.assertEqual(3, len(solutions))
@@ -254,20 +263,37 @@ class TestAlgorithm(unittest.TestCase):
     sols = find_exact_cover_for_rows(placements, names)
     self.assertEqual(1, len(sols))
 
-class TestPartialSolutions(unittest.TestCase):
+class TestVariationsOnFindExactCovers(unittest.TestCase):
 
   def setUp(self):
     self.names = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
     self.unique_solution_rows = [['a', 'd'], ['a', 'd', 'g'], ['b', 'c', 'f'],
             ['b', 'g'], ['c', 'e', 'f'], ['d', 'e', 'g']]
     self.unique_solution_matrix = make_matrix_from_rows(self.unique_solution_rows, self.names)
-    self.unique_solution = [[['a', 'd'], ['b', 'g'], ['c', 'e', 'f']]]
+    self.unique_solution = [['a', 'd'], ['b', 'g'], ['c', 'e', 'f']]
+    self.multiple_solutions_rows = [['c', 'd', 'e'], ['a', 'f'], ['b', 'g'],
+                                    ['a', 'b'], ['f', 'g'], ['b', 'c', 'd', 'e', 'g']]
+    self.expected_multiple_solutions = [[['a', 'b'], ['c', 'd', 'e'], ['f', 'g']],
+                                        [['a', 'f'], ['b', 'c', 'd', 'e', 'g']],
+                                        [['a', 'f'], ['b', 'g'], ['c', 'd', 'e']]]
+
 
   def test_finds_partial_solution_of_full_length(self):
-    partial = find_partial_cover(self.unique_solution_matrix, 3)[0]
+    partial = find_partial_cover(self.unique_solution_matrix, 3)
     pretty = sorted([sorted(row.get_column_names_for_row()) for row in partial])
-    self.assertEqual(self.unique_solution[0], pretty)
+    self.assertEqual(self.unique_solution, pretty)
 
   def test_finds_partial_solution_of_shorter_length(self):
-    partial = find_partial_cover(self.unique_solution_matrix, 2)[0]
+    partial = find_partial_cover(self.unique_solution_matrix, 2)
     self.assertEqual(2, len(partial))
+    all_columns_covered = flatten([sorted(row.get_column_names_for_row()) for row in partial])
+    for index, col in enumerate(all_columns_covered):
+      self.assertFalse(included_in(col, all_columns_covered[index + 1:len(all_columns_covered)]))
+
+  def test_find_two_solutions_of_several(self):
+    matrix = make_matrix_from_rows(self.multiple_solutions_rows, self.names)
+    first_two_solutions = find_n_exact_covers(matrix, 2)
+    pretty_solutions = [[sorted(row.get_column_names_for_row()) for row in solution] for solution in first_two_solutions]
+    self.assertEqual(2, len(first_two_solutions))
+    for sol in pretty_solutions:
+      self.assertTrue(included_in(sol, self.expected_multiple_solutions))
