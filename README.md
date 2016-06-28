@@ -30,6 +30,7 @@ Navigate to project root directory, then run
 ```
 $ python3 -m venv env
 $ source env/bin/activate
+$ pip install -r requirements.txt
 $ python3 -m puzzle
 $ celery --app=puzzle.celery worker --loglevel=info
 ```
