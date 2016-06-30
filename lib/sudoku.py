@@ -34,12 +34,14 @@ def make_header(kind, digit, index):
   return "-".join([str(digit), kind, str(index)])
 
 def column_headers():
-  headers = [make_header("cell", x, y) for x, y in all_positions()] # TODO x isn't a digit, not good naming
-  for digit in range(1, 10):
-    for index in range(0, 9):
-      for kind in ["row", "col", "subgrid"]:
-        headers.append(make_header(kind, digit, index))
-  return headers
+  random.seed(20) # TODO remove
+  secondary_headers = [make_header("cell", x, y) for x, y in all_positions()]
+  primary_headers = []
+  for kind in ["row", "col", "subgrid"]:
+    for digit in range(1, 10):
+      for index in range(0, 9):
+        primary_headers.append(make_header(kind, digit, index))
+  return [primary_headers, secondary_headers]
 
 def make_matrix_row_for_move(x, y, digit):
   subgrid_index = 3 * (y // 3) + x // 3
@@ -49,15 +51,18 @@ def board_to_matrix(board):
   all_coords = all_positions()
   free_coords = [[x, y] for x, y in all_coords if board[y][x] == None]
   filled_coords = [[x, y] for x, y in all_coords if board[y][x] != None]
+  primary_headers, secondary_headers = column_headers()
   possible_rows = flatten([[make_matrix_row_for_move(x, y, digit) for digit in allowed_values_at_coords(x, y, board)] for x, y in free_coords])
   filled_columns = flatten([make_matrix_row_for_move(x, y, board[y][x]) for x, y in filled_coords])
-  available_columns = [header for header in column_headers() if header not in filled_columns]
-  matrix = lib.exact_cover.make_matrix_from_rows(possible_rows, available_columns)
+  available_columns = [header for header in primary_headers if header not in filled_columns]
+  matrix = lib.exact_cover.make_matrix_from_rows(possible_rows, available_columns, secondary_headers)
   return matrix
 
-def row_list_to_board(rows):
+# TODO test
+def nodes_to_board(nodes):
   board = empty_board()
-  for row in rows: # this is giving nodes. i want headers. hmph.
+  rows = [node.get_column_names_for_row() for node in nodes]
+  for row in rows:
     cell_header = [header for header in row if "cell" in header][0]
     row_header = [header for header in row if "row" in header][0]
     x = int(cell_header.split("-")[0])
@@ -67,36 +72,7 @@ def row_list_to_board(rows):
   return board
 
 # TODO test
-def merge_boards(a, b):
-  board = empty_board()
-  for x, y in all_positions():
-    board[y][x] = a[y][x] or b[y][x]
-  return board
-
-def random_clue_set(n = 25):
-  matrix = board_to_matrix(empty_board())
-  nodes = lib.exact_cover.find_partial_cover(matrix, n)
-  rows = [node.get_column_names_for_row() for node in nodes]
-  return row_list_to_board(rows)
-
-def random_empty_coords(board):
-  y = random.choice([i for i in range(0, len(board)) if None in board[i]])
-  x = random.choice([i for i in range(0, len(board)) if board[y][i] == None])
-  return [x, y]
-
-# currently takes about 1:15
 def generate_clue_set():
-  clues = []
-  solutions = []
-  while len(solutions) != 1:
-    clues = random_clue_set(25)
-    matrix = board_to_matrix(clues)
-    solutions = lib.exact_cover.find_n_exact_covers(matrix, 2) # only need to know existence and uniqueness
-    print("found at least %s solutions" %len(solutions), sys.stderr)
-    while len(solutions) > 1:
-      goal = row_list_to_board([node.get_column_names_for_row() for node in solutions[0]])
-      x, y = random_empty_coords(clues)
-      clues[y][x] = goal[y][x]
-      matrix = board_to_matrix(clues)
-      solutions = lib.exact_cover.find_n_exact_covers(matrix, 2)
-  return [clues, solutions[0]]
+  matrix = board_to_matrix(empty_board())
+  clues, solution = [nodes_to_board(lst) for lst in lib.exact_cover.find_random_partial_cover_with_unique_solution(matrix)]
+  return [clues, solution]

@@ -101,26 +101,28 @@ class Column(Node):
 # Algorithm
 
 # TODO most constrained instead
+# TODO in that case will using existing order to break ties provide enough randomness?
 def next_column(matrix):
   return matrix.right
-
-def pick_random_column(matrix):
-  all_columns = []
-  matrix.loop_through_circular_list('right', lambda x: all_columns.append(x))
-  return random.choice(all_columns)
 
 def is_matrix_empty(matrix):
   return matrix.right == matrix
 
-def find_partial_cover(matrix, size):
-  partial_solution = []
-  result = [[]]
+# TODO test
+def find_random_partial_cover_with_unique_solution(matrix):
+  full_solutions = [] # initialize here so done() has a handle to it
+  current_partial_solution = []
+  best_partial_solution = []
   def done():
-    if len(partial_solution) >= size:
-      result[0] = partial_solution.copy()
-      return True
-  find_exact_covers(matrix, None, partial_solution, done, pick_random_column) # using side effect from done
-  return result[0]
+    if len(full_solutions) == 1:
+      print("found a solution")
+      solution_set = set(full_solutions[0])
+      partial = set(current_partial_solution)
+      if partial.issubset(solution_set):
+        best_partial_solution[0:len(best_partial_solution)] = current_partial_solution.copy()
+    return len(full_solutions) > 1
+  solution = find_exact_covers(matrix, full_solutions, current_partial_solution, done)[0]
+  return [best_partial_solution, solution]
 
 def find_n_exact_covers(matrix, n):
   full_solutions = [] # initialize here so done() has a handle to it
