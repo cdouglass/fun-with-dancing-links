@@ -34,13 +34,13 @@ def make_header(kind, digit, index):
   return "-".join([str(digit), kind, str(index)])
 
 def column_headers():
-  random.seed(20) # TODO remove
   secondary_headers = [make_header("cell", x, y) for x, y in all_positions()]
   primary_headers = []
   for kind in ["row", "col", "subgrid"]:
     for digit in range(1, 10):
       for index in range(0, 9):
         primary_headers.append(make_header(kind, digit, index))
+  random.shuffle(primary_headers)
   return [primary_headers, secondary_headers]
 
 def make_matrix_row_for_move(x, y, digit):

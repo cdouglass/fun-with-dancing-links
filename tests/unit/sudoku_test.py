@@ -52,7 +52,9 @@ class TestUtilities(unittest.TestCase):
     self.assertEqual(set(range(1, 10)), allowed_values_at_coords(1, 4, self.empty_board))
 
   def test_all_column_headers(self):
-    self.assertEqual(324, len(column_headers()))
+    primary_headers, secondary_headers = column_headers()
+    self.assertEqual(243, len(primary_headers))
+    self.assertEqual(81, len(secondary_headers))
 
   def test_make_matrix_row_for_move(self):
     row = make_matrix_row_for_move(7, 3, 9)
@@ -117,11 +119,4 @@ class TestCreateBoard(unittest.TestCase):
                      [2, 8, 7, 4, 1, 9, 6, 3, 5],
                      [3, 4, 5, 2, 8, 6, 1, 7, 9]]
 
-  def test_clues_are_valid(self):
-    solutions = find_n_solutions(self.clues, 2)
-    self.assertEqual(flatten(self.solution), flatten(solutions[0])) # TODO
-
   # TODO
-  def x_test_generate_clues(self):
-    print(generate_clue_set())
-    # TODO

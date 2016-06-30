@@ -100,10 +100,16 @@ class Column(Node):
 
 # Algorithm
 
-# TODO most constrained instead
-# TODO in that case will using existing order to break ties provide enough randomness?
+# TODO test
 def next_column(matrix):
-  return matrix.right
+  best_so_far = [matrix.right]
+  l = [matrix.right.size]
+  def compare(column):
+    if column.size < l[0]:
+      l[0] = column.size
+      best_so_far[0] = column
+  matrix.loop_through_circular_list('right', compare)
+  return best_so_far[0]
 
 def is_matrix_empty(matrix):
   return matrix.right == matrix

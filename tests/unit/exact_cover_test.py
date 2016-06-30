@@ -219,8 +219,8 @@ class TestAlgorithm(unittest.TestCase):
 
   def test_finds_solution_on_simple_matrix(self):
     solutions = find_exact_covers(self.unique_solution_matrix)
-    pretty_solutions = sorted([[sorted(row.get_column_names_for_row())
-                                for row in solution]
+    pretty_solutions = sorted([sorted([sorted(row.get_column_names_for_row())
+                                for row in solution])
                               for solution in solutions])
     self.assertEqual(1, len(solutions))
     self.assertEqual(self.unique_solution, pretty_solutions)
@@ -276,19 +276,6 @@ class TestVariationsOnFindExactCovers(unittest.TestCase):
     self.expected_multiple_solutions = [[['a', 'b'], ['c', 'd', 'e'], ['f', 'g']],
                                         [['a', 'f'], ['b', 'c', 'd', 'e', 'g']],
                                         [['a', 'f'], ['b', 'g'], ['c', 'd', 'e']]]
-
-
-  def test_finds_partial_solution_of_full_length(self):
-    partial = find_partial_cover(self.unique_solution_matrix, 3)
-    pretty = sorted([sorted(row.get_column_names_for_row()) for row in partial])
-    self.assertEqual(self.unique_solution, pretty)
-
-  def test_finds_partial_solution_of_shorter_length(self):
-    partial = find_partial_cover(self.unique_solution_matrix, 2)
-    self.assertEqual(2, len(partial))
-    all_columns_covered = flatten([sorted(row.get_column_names_for_row()) for row in partial])
-    for index, col in enumerate(all_columns_covered):
-      self.assertFalse(included_in(col, all_columns_covered[index + 1:len(all_columns_covered)]))
 
   def test_find_two_solutions_of_several(self):
     matrix = make_matrix_from_rows(self.multiple_solutions_rows, self.names)
