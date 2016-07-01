@@ -74,5 +74,6 @@ def nodes_to_board(nodes):
 # TODO test
 def generate_clue_set():
   matrix = board_to_matrix(empty_board())
-  clues, solution = [nodes_to_board(lst) for lst in lib.exact_cover.find_random_partial_cover_with_unique_solution(matrix)]
-  return [clues, solution]
+  solution = lib.exact_cover.find_n_exact_covers(matrix, 1)[0]
+  clues = lib.exact_cover.shrink_partial_with_unique_solution(solution, matrix)
+  return [nodes_to_board(lst) for lst in [clues, solution]]

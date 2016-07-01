@@ -115,20 +115,24 @@ def is_matrix_empty(matrix):
   return matrix.right == matrix
 
 # TODO test
-def find_random_partial_cover_with_unique_solution(matrix):
-  full_solutions = [] # initialize here so done() has a handle to it
-  current_partial_solution = []
-  best_partial_solution = []
-  def done():
-    if len(full_solutions) == 1:
-      print("found a solution")
-      solution_set = set(full_solutions[0])
-      partial = set(current_partial_solution)
-      if partial.issubset(solution_set):
-        best_partial_solution[0:len(best_partial_solution)] = current_partial_solution.copy()
-    return len(full_solutions) > 1
-  solution = find_exact_covers(matrix, full_solutions, current_partial_solution, done)[0]
-  return [best_partial_solution, solution]
+def shrink_partial_with_unique_solution(partial, matrix, count=0):
+  n = random.randint(0, len(partial) - 1)
+  smaller = partial[0:n] + partial[n+1:]
+  random.shuffle(smaller)
+  for node in smaller:
+    node.column.cover_column()
+    node.cover_all_other_columns_in_row()
+  solutions = find_n_exact_covers(matrix, 2)
+  smaller.reverse()
+  for node in smaller:
+    node.uncover_all_other_columns_in_row()
+    node.column.uncover_column()
+  if len(solutions) == 1:
+    return shrink_partial_with_unique_solution(smaller, matrix, 0)
+  elif count < 5: # arbitrary number of retries in a row before giving up
+    return shrink_partial_with_unique_solution(partial, matrix, count + 1)
+  else:
+    return partial
 
 def find_n_exact_covers(matrix, n):
   full_solutions = [] # initialize here so done() has a handle to it
@@ -153,8 +157,7 @@ def find_exact_covers(matrix, full_solutions = None, partial_solution = None, do
       partial_solution.append(row)
       row.cover_all_other_columns_in_row()
       find_exact_covers(matrix, full_solutions, partial_solution, done, next_col)
-      if done(): # lets find_partial_cover return sooner
-        return full_solutions
+      done() # only using for side effects - not pretty
       row.uncover_all_other_columns_in_row()
       partial_solution.pop()
     column.uncover_column() # restore matrix to original state
