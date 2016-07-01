@@ -23,7 +23,6 @@ function tempHighlight(elt, options) {
   }, 10);
 }
 
-
 function rainbow(elt) {
   "use strict";
   var hue = 0;
@@ -56,12 +55,8 @@ function rainbow(elt) {
 
 function getCoords(cell) {
   "use strict";
-  return cell.attr('id').split("-");
-}
-
-function getCoords(cell) {
-  "use strict";
-  return cell.attr('id').split("-");
+  var digits = cell.attr('id').split("-");
+  return digits.map(function (x) { return parseInt(x, 10); });
 }
 
 function getCell(coords) {
@@ -157,6 +152,11 @@ $('.free').on('focus', function () {
 $('.free').on('contextmenu', function () {
   "use strict";
   clear($(this));
+}).on('keydown', function (e) {
+  "use strict";
+  if (e.keyCode === 32) {
+    clear($(this));
+  }
 });
 
 $('#clear').on('click', function () { // also occurs on submitting via enter
@@ -166,3 +166,31 @@ $('#clear').on('click', function () { // also occurs on submitting via enter
 });
 
 $('#hint').on('click', hint);
+$('.square').keydown(function (e) {
+  "use strict";
+  var elt = $(document.activeElement),
+    x = 0,
+    y = 0;
+  if (elt.hasClass('square')) {
+    [x, y] = getCoords($(document.activeElement));
+    switch (e.keyCode) {
+    case 37: // left
+    case 72: // h (fallthrough)
+      x -= 1;
+      break;
+    case 38: // up
+    case 75: // k
+      y -= 1;
+      break;
+    case 39: // right
+    case 76: // l
+      x += 1;
+      break;
+    case 40: // down
+    case 74: // j
+      y += 1;
+      break;
+    }
+    $(getCell([x, y])).focus();
+  }
+});

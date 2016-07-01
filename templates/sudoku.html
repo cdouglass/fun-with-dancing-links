@@ -11,7 +11,7 @@
         {% set row_num = loop.index - 1 %}
         {% for clue in row %}
           {% if clue %}
-            <div id="{{ loop.index - 1 }}-{{row_num}}" class="square given">{{clue}}</div>
+            <div id="{{ loop.index - 1 }}-{{row_num}}" class="square given" tabindex="-1">{{clue}}</div>
           {% else %}
             <div id="{{ loop.index - 1 }}-{{row_num}}" class="square free" tabindex="0"></div>
           {% endif %}
@@ -26,7 +26,7 @@
   </div>
   <h2>How to play</h2>
   <p>Your goal: to fill every row, column, and 3x3 subgrid with exactly one of each of the digits 1 through 9.</p>
-  <p>To fill a square, click on or tab to it, then enter a digit. Right click to clear. Click "Hint" to get a free value for one square.</p>
+  <p>To fill a cell, click on or tab to it, then enter a digit. Right click, or focus the cell and press the spacebar, to clear. Click "Hint" to get a free value for one cell.</p>
 {% endblock %}
 {% block scripts %}
   <script>var None = null, solution = {{solution}}, clueSet = {{clue_set}};</script>
