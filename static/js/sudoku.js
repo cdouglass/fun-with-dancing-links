@@ -34,6 +34,9 @@ function rainbow(elt) {
     hue += inc;
     tempHighlight(elt, {color: makeColor(hue - inc), duration: '1s', next: makeColor(hue)});
   }
+  function end() {
+    tempHighlight(elt, {color: makeColor(hue), duration: '1s', next: 'white'});
+  }
   nextColor();
   setTimeout(function () { nextColor();
     setTimeout(function () { nextColor();
@@ -43,6 +46,7 @@ function rainbow(elt) {
               setTimeout(function () { nextColor();
                 setTimeout(function () { nextColor();
                   setTimeout(function () { nextColor();
+                    setTimeout(end, 1000);
                   }, 1000);
                 }, 1000);
               }, 1000);
@@ -127,8 +131,7 @@ function clear(cell) {
 function hint() {
   "use strict";
   var emptyCells = $.find('.square').filter(function (cell) {
-    var empty = $(cell).text() === '';
-    return empty;
+    return $(cell).text() === '';
   }),
     cell = chooseRandomFromArr(emptyCells),
     coords,

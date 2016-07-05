@@ -16,7 +16,7 @@ class Root:
     self.right      = column
 # does NOT apply fn to given node - ONLY to rest in its loop!
 # Root, (fn(Root) -> Root), (fn(Root, [Root]) -> T) -> [T]
-  def loop_through_circular_list(self, direction, fn):
+  def traverse_loop(self, direction, fn):
     move = lambda x: getattr(x, direction)
     current_node  = move(self)
     visited_nodes = [self]
@@ -30,7 +30,7 @@ class Root:
     return results
   # Root, [header] -> Node
   def add_row(self, row):
-    nodes = self.loop_through_circular_list('right', lambda x: x.add_node_to_column_if_element_present(row))
+    nodes = self.traverse_loop('right', lambda x: x.add_node_to_column_if_element_present(row))
     nodes = [n for n in nodes if n is not None]
     if len(nodes) > 0:
       current_node = nodes[0]
@@ -58,15 +58,15 @@ class Node(Root):
   def restore_vertically(self):
     self.up.insert_below(self)
   def cover_row(self):
-    self.loop_through_circular_list('right', lambda n: n.remove_vertically())
+    self.traverse_loop('right', lambda n: n.remove_vertically())
   def uncover_row(self):
-    self.loop_through_circular_list('right', lambda x: x.restore_vertically())
+    self.traverse_loop('right', lambda x: x.restore_vertically())
   def get_column_names_for_row(self):
-    return [self.column.name] + self.loop_through_circular_list('right', lambda x: x.column.name)
+    return [self.column.name] + self.traverse_loop('right', lambda x: x.column.name)
   def cover_all_other_columns_in_row(self):
-    self.loop_through_circular_list('right', lambda x: x.column.cover_column())
+    self.traverse_loop('right', lambda x: x.column.cover_column())
   def uncover_all_other_columns_in_row(self):
-    self.loop_through_circular_list('left', lambda x: x.column.uncover_column())
+    self.traverse_loop('left', lambda x: x.column.uncover_column())
 
 class Column(Node):
   def __init__(self, name):
@@ -87,9 +87,9 @@ class Column(Node):
   def cover_column(self):
     self.remove_horizontally()
     # for each non-top-level node in column, remove that node from matrix
-    self.loop_through_circular_list('down', lambda x: x.cover_row()) # removing top to bottom (so must uncover bottom to top)
+    self.traverse_loop('down', lambda x: x.cover_row()) # removing top to bottom (so must uncover bottom to top)
   def uncover_column(self):
-    self.loop_through_circular_list('up', lambda x: x.uncover_row())
+    self.traverse_loop('up', lambda x: x.uncover_row())
     self.restore_horizontally()
   # [str], Column -> Node
   def add_node_to_column_if_element_present(self, row):
@@ -108,7 +108,7 @@ def next_column(matrix):
     if column.size < l[0]:
       l[0] = column.size
       best_so_far[0] = column
-  matrix.loop_through_circular_list('right', compare)
+  matrix.traverse_loop('right', compare)
   return best_so_far[0]
 
 def is_matrix_empty(matrix):
@@ -152,7 +152,7 @@ def find_exact_covers(matrix, full_solutions = None, partial_solution = None, do
   elif matrix.right.up != matrix.right:
     column = next_col(matrix)
     column.cover_column()
-    rows_in_column = column.loop_through_circular_list('down', lambda x: x) # [Node]
+    rows_in_column = column.traverse_loop('down', lambda x: x) # [Node]
     for row in rows_in_column:
       partial_solution.append(row)
       row.cover_all_other_columns_in_row()
@@ -203,7 +203,7 @@ def make_rows_from_matrix(matrix):
   while matrix.right != matrix:
     column = matrix.right
     if column.down != column:
-      raw_rows = column.loop_through_circular_list('down', lambda x: x.get_column_names_for_row())
+      raw_rows = column.traverse_loop('down', lambda x: x.get_column_names_for_row())
       rows += [sorted(r) for r in raw_rows]
     column.cover_column()
     columns.append(column)

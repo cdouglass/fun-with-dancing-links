@@ -21,7 +21,7 @@ def is_valid_column(column):
   if not all([check_circularity(v_move, column) for v_move in vertical_moves]): # check column is circular both ways
     return False
   else: # moving downward, checks each row is circular both ways
-    return all(all(column.loop_through_circular_list(vertical_moves[0],
+    return all(all(column.traverse_loop(vertical_moves[0],
                                                      lambda x: check_circularity(h_move, x)))
               for h_move in horizontal_moves)
 
@@ -32,14 +32,14 @@ def is_valid_matrix(matrix):
   horizontal_moves = ['right', 'left']
   for h_move in horizontal_moves:
     if not (check_circularity(h_move, matrix) and
-           all(matrix.loop_through_circular_list(h_move, is_valid_column))):
+           all(matrix.traverse_loop(h_move, is_valid_column))):
       return False
   return True
 
 # Root -> bool
 def check_circularity(move, node):
   try:
-    node.loop_through_circular_list(move, lambda *args: None)
+    node.traverse_loop(move, lambda *args: None)
   except InvalidLooping:
     return False
   return True
