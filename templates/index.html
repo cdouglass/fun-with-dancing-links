@@ -4,24 +4,22 @@
 {% block content %}
 <h1>Fun with dancing links</h1>
 
-<h2>About</h2>
-
 <p>This project is a demonstration of the use of the dancing links method of solving exact cover problems.
 
-<h3>Context: Exact cover problems</h3>
+<h2>Context: Exact cover problems</h2>
 
-<p>These are problems where the goal is to find a solution satisfying each one of a set of conditions exactly once. The obvious way to find all solutions to such a problem is performing a brute-force search using backtracking. Since the exact cover problem is NP-complete, as far as we know it takes time exponential in the size of the input to solve deterministically, so there's no approach that's substantially more efficient than backtracking. The dancing links technique doesn't overcome this, but it uses a nifty data structure that makes it very convenient to undo an attempted move without needing to copy any saved state. A paper describing its use, with several examples, is available at <a href="http://arxiv.org/abs/cs/0011047">arxiv.org</a>.</p>
+<p>These are problems where the goal is to find a solution satisfying each one of a set of conditions exactly once. The obvious way to find all solutions to such a problem is performing a brute-force search using backtracking. Since the exact cover problem is NP-complete, as far as we know it takes time exponential in the size of the input to solve deterministically, so there's no approach that's substantially more efficient than backtracking. The dancing links technique doesn't overcome this, but it uses a nifty data structure that makes it very convenient to undo an attempted move without needing to copy any saved state. Knuth's paper describing its use, with several examples, is available at <a href="http://arxiv.org/abs/cs/0011047">arxiv.org</a>.</p>
 
-<h3>The N queens problem</h3>
+<h2>The N queens problem</h2>
 
 <p>This is a generalization of the <a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle">eight queens problem</a>, a well-known logical puzzle where the goal is to place eight queens on an 8x8 chess board so that none of them threaten one another. The N queens problem is not strictly an exact cover problem, since each diagonal may contain either one or zero queens, but this can be handled with a slight change to the data structure involved to allow some constraints to be satisfied at most once instead of exactly once.</p>
 
-<a class="internal" href="/n_queens"><div>Interactive N queens solver</div></a>
+<p><a href="/n_queens"><div>N queens solver</div></a></p>
 
-<h3>Sudoku</h3>
+<h2>Sudoku</h2>
 
-<p>This is a straightforward exact cover problem: each row, column, and 3x3 subgrid must have exactly one of each digit from 1 through 9. Here we randomly generate a set of clues, using the exact cover solver to confirm that the clue set yields exactly one solution before presenting it to the user.</p>
+<p>This is a straightforward exact cover problem: each row, column, and 3x3 subgrid must have exactly one of each digit from 1 through 9. Here we randomly generate a set of clues, using the exact cover solver to confirm that the clue set is "satisfactory", i.e. has exactly one solution, before presenting it to the user.</p>
 
-<a class="internal" href="/sudoku"><div>Play Sudoku</div></a>
+<p><a href="/sudoku"><div>Play Sudoku</div></a></p>
 
 {% endblock %}

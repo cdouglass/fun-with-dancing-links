@@ -6,7 +6,6 @@ import lib.n_queens
 import lib.sudoku
 
 app = flask.Flask(__name__)
-# changed from .get("thingy") to ["thingy"] at same time as CLOUDAMQP -> REDIS_URL
 app.config['CELERY_BROKER_URL'] = os.environ.get("CLOUDAMQP_URL")
 app.config['CELERY_RESULT_BACKEND'] = os.environ.get("CLOUDAMQP_URL")
 app.config['CELERY_IGNORE_RESULT'] = False
@@ -23,6 +22,10 @@ def solve_n_queens_in_background(n):
 @app.route('/')
 def index():
   return flask.render_template('index.html')
+
+@app.route('/about')
+def about():
+  return flask.render_template('about.html')
 
 @app.route('/sudoku')
 def sudoku():

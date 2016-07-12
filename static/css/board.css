@@ -5,7 +5,7 @@
 .grid {
   padding: 1px 0; /* prevents vertical scrollbar */
   overflow-x: auto;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .row {
@@ -14,8 +14,9 @@
   overflow: visible;
 }
 
-.row:last-child .square {
-  border-bottom: 1px solid black;
+.row, .square {
+  border-color: black;
+  border-style: solid;
 }
 
 .square {
@@ -24,8 +25,8 @@
   display: inline-block;
   height: 100%;
   width: 30px;
-  border-left: 1px solid black;
-  border-top: 1px solid black;
+  border-left-width: 1px;
+  border-top-width: 1px;
   font-size: 1.75em;
   text-align: center;
 }
@@ -37,10 +38,19 @@
 
 .square:first-child {
   margin: 0;
+  border-left-width: 3px;
 }
 
 .square:last-child {
-  border-right: 1px solid black;
+  border-right: 3px solid black;
+}
+
+.row:last-child .square {
+  border-bottom-width: 3px;
+}
+
+.row:first-child .square {
+  border-top-width: 3px;
 }
 
 /*CHESS*/
@@ -61,13 +71,6 @@
 
 .sudoku .square:nth-child(3n + 1) {
   border-left-width: 3px;
-}
-.sudoku .square:last-child {
-  border-right-width: 3px;
-}
-
-.sudoku .row:last-child .square {
-  border-bottom-width: 3px;
 }
 
 .sudoku .row:nth-child(3n+1) .square {
