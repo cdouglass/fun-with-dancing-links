@@ -97,10 +97,38 @@ button {
   text-align: center;
 }
 
+#solutions-info {
+  margin-bottom: 5px;
+}
+
 #spinner {
-  opacity: 0;
-  font-size: 2em;
-  text-align: center;
-  line-height: 0;
-  margin: 0 0 20px 0;
+  height: 4px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.loading {
+  width: 70%;
+  position: relative;
+  overflow: hidden;
+  background-color: #ddd;
+}
+.loading:before{
+  display: block;
+  position: absolute;
+  content: "";
+  left: -200px;
+  width: 200px;
+  height: 4px;
+  background-color: #2980b9;
+  animation: loading 2s linear infinite;
+}
+
+@keyframes loading {
+  from {left: -200px; width: 30%;}
+  50% {width: 30%;}
+  70% {width: 70%;}
+  80% {left: 50%;}
+  95% {left: 120%;}
+  to {left: 100%;}
 }

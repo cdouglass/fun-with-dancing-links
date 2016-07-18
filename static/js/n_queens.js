@@ -46,7 +46,7 @@ function pollBackgroundTask(responseUrl, taskId) {
       $('#solution_count').text(solutions.length);
       $('#solutions-info').delay(600).animate({opacity: 1});
       $('button').prop('disabled', false);
-      $('#spinner').finish();
+      $('#spinner').removeClass('loading');
       if (solutions.length > 0) {
         goToNewSolution(0);
       }
@@ -63,17 +63,12 @@ $(window).bind('popstate', function () {
   var url = location.href,
     queryString = '?' + url.split('?')[1];
   $.ajax('/n_queens_board_only' + queryString).done(function (response) {
-    $('#board-container').html(response);
     $('#solutions-info').css('opacity', 0);
+    $('#board-container').html(response);
     $.ajax('/n_queens_solutions_only' + queryString).done(function (response) {
       pollBackgroundTask(response.Location, response.task_id);
     });
   });
-});
-
-$(document).on('ajaxStart', function () {
-  "use strict";
-  $('#spinner').animate({opacity: 1}, 400).animate({opacity: 0}, 400);
 });
 
 $(document).ready(function () {
@@ -97,11 +92,11 @@ $('form').on('submit', function (event) {
   history.pushState({}, '', '/n_queens' + queryString);
   $.ajax('/n_queens_board_only' + queryString).done(function (response) {
     $('#board-container').html(response);
+    solutions = [];
+    $('#spinner').addClass('loading');
     $('#solutions-info').css('opacity', 0);
     $.ajax('/n_queens_solutions_only' + queryString).done(function (response) {
       pollBackgroundTask(response.Location, response.task_id);
     });
   });
 });
-
-
